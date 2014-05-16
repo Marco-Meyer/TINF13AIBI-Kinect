@@ -28,7 +28,7 @@ for overwrite in sys.argv[1:]:
 import pygame
 from pygame import gfxdraw
 from random import randint
-import animations
+import effects
 
 if POSTPROCESS:
     try:
@@ -74,11 +74,11 @@ boardcolors = ((0,0,0),(255,255,255)) if INVISCENTER else ((255,255,255),(0,0,0)
 fon = pygame.font.Font(None, 40)
 
 
-#animations = []
+#animations= []
 base = pygame.image.load("paddle.png")
 #for i in range(PLAYERS+AIPLAYERS):
     
-padanim= animations.VerticalDivergence((padwidth, padheight),
+padanim= effects.VerticalDivergence((padwidth, padheight),
                                         base, 0.02)
 def setup_sizes():
     global invisrect, area, surf, cenw, cenh

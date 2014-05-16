@@ -68,10 +68,24 @@ class HorizontalDivergence(VerticalDivergence):
         self.center = (self.w//2,0)
         self.flips = (1,0)
         self.clamp = P.Rect(0,0,self.w//2, self.h)
-    
+        
+def repeated_surface(source, size, offset = (0,0)):
+    surface = P.Surface(size)
+    w,h = size
+    xloc, yloc = offset
+    sw, sh = source.get_size()
+    xloc -= sw
+    yloc -= sh
+    for x,y in product(range(xloc, w, sw), range(yloc, h, sh)):
+        surface.blit(source, (x,y))
+    return surface
+        
 if __name__ == "__main__":
+    
+    bar = P.image.load("bar.png")
+    P.image.save(repeated_surface(bar, (800, 600),(10,10)), "barmul.png")
     clock = P.time.Clock()
-    slide = HorizontalSlide((400,100),P.image.load("bar.png"), 0.1)
+    slide = HorizontalSlide((400,100),bar, 0.1)
     P.init()
     D = P.display.set_mode((420,120))
     P.display.set_caption("Close Window to show next")
@@ -86,7 +100,7 @@ if __name__ == "__main__":
         P.display.flip()
         dt = clock.tick(200)
     
-    surf = P.transform.rotate(P.image.load("bar.png"), 90)
+    surf = P.transform.rotate(bar, 90)
     slide = VerticalSlide((100,400),surf, 0.1)
     D = P.display.set_mode((120,420))
     running = True
@@ -99,7 +113,7 @@ if __name__ == "__main__":
         P.display.flip()
         dt = clock.tick(200)
     
-    slide = VectorSlide((400,400),P.image.load("bar.png"), (0.1,0.1))
+    slide = VectorSlide((400,400),bar, (0.1,0.1))
     D = P.display.set_mode((420,420))
     running = True
     while running:
@@ -110,7 +124,7 @@ if __name__ == "__main__":
         D.blit(slide.surface, (10,10))
         P.display.flip()
         dt = clock.tick(200)
-    slide = VerticalDivergence((400,400),P.image.load("bar.png"), 0.1)
+    slide = VerticalDivergence((400,400),bar, 0.1)
     D = P.display.set_mode((420,420))
     running = True
     while running:
@@ -121,7 +135,7 @@ if __name__ == "__main__":
         D.blit(slide.surface, (10,10))
         P.display.flip()
         dt = clock.tick(200)
-    slide = HorizontalDivergence((400,200),P.image.load("bar.png"), 0.1)
+    slide = HorizontalDivergence((400,200),bar, 0.1)
     D = P.display.set_mode((420,220))
     running = True
     while running:
