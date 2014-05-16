@@ -31,7 +31,11 @@ from random import randint
 import animations
 
 if POSTPROCESS:
-    import projection
+    try:
+        import projection
+    except:
+        POSTPROCESS = False
+        print("Problem with OpenGL Init, skipping.")
     #projection.init(RESOLUTION)
 else:
     projection = False
