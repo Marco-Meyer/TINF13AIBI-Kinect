@@ -11,13 +11,40 @@ W,H = FIELD = (4,4)
 GRID = 120#Size of grid squares
 resw, resh = resolution = W*GRID, H*GRID
 
+vext = 72
+vextH = vext/2
+reswH = resw/2
+
+shadowd = 4
+side = 100
+
 GRIDh = GRID//2#half the size of a grid
 GRIDv = GRIDh//2#quarter "
-D = P.display.set_mode(resolution)
-P.display.set_caption("2048 YAC")
+
+S = P.display.set_mode((resw, resh+vext))
+D = S.subsurface((0, vext, resw, resh))
+U1 = S.subsurface((0, 0, reswH, vext))
+U2 = S.subsurface((reswH, 0, reswH, vext))
+P.display.set_caption("2048 Kinergie")
 
 from events import Manager
 F = P.font.Font(None, 70)#System default font @ 70 size
+scF = P.font.Font(None, 36)#Font of Scorebar @ 36 size
+
+#Design&Sound
+image_directory = 'Images/'
+music_directory = 'Sounds/'
+
+bgU = P.image.load(image_directory+'des1.jpg')
+bgD = P.image.load(image_directory+'des2.jpg')
+
+background_m = P.mixer.music.load(music_directory+'Background.mp3')
+#start_m = P.mixer.music.load(music_directory+'Start.mp3')
+#win_m = P.mixer.music.load(music_directory+'Win.mp3')
+#lose_m = P.mixer.music.load(music_directory+'Lose.mp3')
+#slide_m = P.mixer.music.load(music_directory+'Slide.mp3')
+wrong_m = P.mixer.music.load(music_directory+'Wrong.mp3')
+#background_m = P.mixer.music.load(music_directory+'Background.mp3')
 
 ####GAMEEVENTS####
 EM = Manager()
@@ -26,6 +53,32 @@ eventnames = {"game_start" : "grid","game_end" : "grid","game_frame_start" : "di
 [EM.register_event(name, argnames = args) for name, args in eventnames.items()]
 print(EM)
 ##################
+
+class Score():
+    def __init__(self):
+        self.current = 0
+        self.highest = 0
+    def __iadd__(self, other):
+        self.current += other
+        if self.current > self.highest:
+            self.highest = self.current
+        return self
+
+class Scorebar():
+    def __init__(self):
+        self.refresh()
+    def refresh(self):
+        U1.blit(bgU, (0,0))
+        U2.blit(bgU, (0,0))
+        self.labCur = scF.render("Score:", True, (255, 255, 255))
+        self.labHig = scF.render("Highscore:", True, (255, 255, 255))
+        blit_centered(U1, self.labCur, (reswH/2, vextH/3))
+        blit_centered(U2, self.labHig, (reswH/2, vextH/3))
+
+        advCur = scF.render("%s" % (score.current), True, (255, 255, 255))
+        advHig = scF.render("%s" % (score.highest), True, (255, 255, 255))
+        blit_centered(U1, advCur, (reswH/2, vextH/3*4))
+        blit_centered(U2, advHig, (reswH/2, vextH/3*4))
 
 class Grid():
     def __init__(self, x,y):
@@ -80,6 +133,7 @@ class Grid():
             if slice[xi] == val and xi not in blocked:#not already merged and has to be equal
                 slice[xi] = val*2
                 slice[x] = 0
+                addscore(val*2)#Adds won points to score
                 blocked.add(xi)#prevent multiple merges per movement
                 movement = True
                 break
@@ -97,8 +151,6 @@ class Grid():
             if self.move_slice(self.area[:, y]): moves = True
         if direction:self.area = numpy.rot90(self.area, 4-direction)
         return moves
-
-grid = Grid(W,H)
 
 def rot90(x,y, times):
     #not sure if it's working
@@ -119,11 +171,23 @@ def blit_centered(target, blitter, pos):
     xd, yd = blitter.get_size()
     target.blit(blitter, (x-xd//2,y-yd//2))
 
+def addscore(points):
+    global score
+    score += points
+    scbar.refresh()#refreshes the scorebar with current score
+
+#Initialisationblock
+
+score = Score()
+scbar = Scorebar()
+grid = Grid(W,H)
+posses = tuple(pos_gen())#all (x,y) pairs of the grid
     
 #colors
 background = P.Color("light grey")
 base = P.Color(250, 250, 250)
 clock = P.time.Clock()
+shadow = P.Color(100, 100, 100)
 grid.fill_random()
 grid.fill_random()
 text = { 2**x : F.render(str(2**x), 1, (0,0,0), base) for x in range(20)}
@@ -155,16 +219,21 @@ if __name__ == "__main__":
                     grid.last = numpy.copy(grid.area)
                     if grid.move(direction-1):
                         grid.fill_random()
+                    print(score)
                     
         #####LOGICBLOCK#####
         EM.dispatch("game_logic_start", grid)
         #####RENDERBLOCK#####
         D.fill(background)
+        D.blit(bgD, (0,0))
         EM.dispatch("game_frame_start", D)
-        delta = grid.area != grid.last
+
+        delta = grid.area != grid.last #elementwise check for matrix
         for x,y in posses:
             val = grid.area[x, y]
-            rect = x*GRID+GRIDv,y*GRID+GRIDv,GRIDh,GRIDh
+            rectshadow = x*GRID+GRIDh-side/2+shadowd, y*GRID+GRIDh-side/2+shadowd, side, side
+            P.draw.rect(D, shadow, rectshadow, 0)
+            rect = x*GRID+GRIDh-side/2, y*GRID+GRIDh-side/2, side, side
             P.draw.rect(D, base, rect, 0)
             if val:
                 pos = x*GRID+GRIDh,y*GRID+GRIDh
