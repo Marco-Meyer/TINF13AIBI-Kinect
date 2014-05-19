@@ -5,7 +5,7 @@ import sys
 sys.path.append("Engine")
 from itertools import product
 import numpy
-from os.path import join as join
+from os.path import join
 from sounds import Sounds
 P.init()
 W,H = FIELD = (4,4)

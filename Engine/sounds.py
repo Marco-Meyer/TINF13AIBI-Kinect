@@ -1,3 +1,4 @@
+from os.path import join
 import pygame as P
 
 class Sounds():
