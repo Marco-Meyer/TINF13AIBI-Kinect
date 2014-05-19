@@ -38,12 +38,12 @@ music_directory = 'Sounds/'
 bgU = P.image.load(image_directory+'des1.jpg')
 bgD = P.image.load(image_directory+'des2.jpg')
 
-background_m = P.mixer.music.load(music_directory+'Background.mp3')
+#background_m = P.mixer.music.load(music_directory+'Background.mp3')
 #start_m = P.mixer.music.load(music_directory+'Start.mp3')
 #win_m = P.mixer.music.load(music_directory+'Win.mp3')
 #lose_m = P.mixer.music.load(music_directory+'Lose.mp3')
 #slide_m = P.mixer.music.load(music_directory+'Slide.mp3')
-wrong_m = P.mixer.music.load(music_directory+'Wrong.mp3')
+#wrong_m = P.mixer.music.load(music_directory+'Wrong.mp3')
 #background_m = P.mixer.music.load(music_directory+'Background.mp3')
 
 ####GAMEEVENTS####
@@ -103,6 +103,22 @@ class Grid():
         self.area[x, y] = 2 if randint(0,3) else 4#25% chance for a 4
         self.fresh.add((x,y))
         return True
+
+    def check_merge(self):
+        """Just Checks the Tile for mergability"""
+        for d in range(4):
+            if d: self.area = numpy.rot90(self.area, d)
+            for y in range(H):
+                slice = self.area[:, y]
+                for x in range(W-1, -1, -1):
+                    if slice[x]:
+                        val = slice[x]
+                        for xi in range(x+1, W):
+                            if slice[xi] == val:
+                                if d: self.area = numpy.rot90(self.area, 4-d)
+                                return True
+        if d: self.area = numpy.rot90(self.area, 4-d)
+        return False
     
     def move_slice(self, slice):
         """Merges and Moves all Tiles to the right in a horizontal slice"""
@@ -141,7 +157,7 @@ class Grid():
                 break
         return movement
     
-    def move(self, direction = 0):
+    def move(self, direction = 0):#if we just want to test a move set test=True
         """Moves the entire Grid in direction"""
         EM.dispatch("movement_start", self, direction)
         used = set()
@@ -200,6 +216,11 @@ EM.dispatch("game_start", grid)
 if __name__ == "__main__":
     while 1:
         #####EVENTBLOCK#####
+        #Testing if GameOver
+        if grid.area.all() and not grid.check_merge():
+            print("schalalala")
+            
+            
         for e in P.event.get():
             if e.type == P.QUIT:
                 P.quit()
@@ -219,7 +240,7 @@ if __name__ == "__main__":
                     grid.last = numpy.copy(grid.area)
                     if grid.move(direction-1):
                         grid.fill_random()
-                    print(score)
+                        
                     
         #####LOGICBLOCK#####
         EM.dispatch("game_logic_start", grid)
@@ -243,3 +264,5 @@ if __name__ == "__main__":
         EM.dispatch("game_frame_end", D)
         P.display.flip()
         clock.tick(60)
+
+
