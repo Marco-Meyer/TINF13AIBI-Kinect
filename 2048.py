@@ -1,6 +1,7 @@
 import pygame as P
 from random import *
 from array import array
+import copy
 import sys
 sys.path.append("Engine")
 from itertools import product
@@ -103,22 +104,6 @@ class Grid():
         self.area[x, y] = 2 if randint(0,3) else 4#25% chance for a 4
         self.fresh.add((x,y))
         return True
-
-    def check_merge(self):
-        """Just Checks the Tile for mergability"""
-        for d in range(4):
-            if d: self.area = numpy.rot90(self.area, d)
-            for y in range(H):
-                slice = self.area[:, y]
-                for x in range(W-1, -1, -1):
-                    if slice[x]:
-                        val = slice[x]
-                        for xi in range(x+1, W):
-                            if slice[xi] == val:
-                                if d: self.area = numpy.rot90(self.area, 4-d)
-                                return True
-        if d: self.area = numpy.rot90(self.area, 4-d)
-        return False
     
     def move_slice(self, slice):
         """Merges and Moves all Tiles to the right in a horizontal slice"""
@@ -157,7 +142,7 @@ class Grid():
                 break
         return movement
     
-    def move(self, direction = 0):#if we just want to test a move set test=True
+    def move(self, direction = 0):
         """Moves the entire Grid in direction"""
         EM.dispatch("movement_start", self, direction)
         used = set()
@@ -178,8 +163,6 @@ assert(rot90(3,2,4) == (3,2))
 
 def pos_gen():
     yield from product(range(W), range(H))
-    
-posses = tuple(pos_gen())#all (x,y) pairs of the grid
 
 def blit_centered(target, blitter, pos):
     """Blits blitter centered on pos onto target"""
@@ -191,6 +174,13 @@ def addscore(points):
     global score
     score += points
     scbar.refresh()#refreshes the scorebar with current score
+
+def check_merge(grid):
+    grid_twit = copy.deepcopy(grid)
+    for d in range(4):
+        grid_twit.move(d)
+        if numpy.array_equal(grid_twit.area, grid.area): return False
+    return True
 
 #Initialisationblock
 
@@ -216,11 +206,6 @@ EM.dispatch("game_start", grid)
 if __name__ == "__main__":
     while 1:
         #####EVENTBLOCK#####
-        #Testing if GameOver
-        if grid.area.all() and not grid.check_merge():
-            print("schalalala")
-            
-            
         for e in P.event.get():
             if e.type == P.QUIT:
                 P.quit()
@@ -240,6 +225,7 @@ if __name__ == "__main__":
                     grid.last = numpy.copy(grid.area)
                     if grid.move(direction-1):
                         grid.fill_random()
+                        print (check_merge(grid))
                         
                     
         #####LOGICBLOCK#####
