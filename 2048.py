@@ -174,6 +174,7 @@ score = Score()
 scbar = Scorebar()
 grid = Grid(W,H)
 posses = tuple(pos_gen())#all (x,y) pairs of the grid
+sounds = Sounds()
 
 #colors
 background = P.Color("light Grey")

@@ -1,3 +1,4 @@
+import pygame as P
 
 class Sounds():
     def __init__(self):
