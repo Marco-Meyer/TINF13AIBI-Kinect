@@ -168,30 +168,40 @@ def sounds(situation):
     P.mixer.Sound(join('Sounds', situation.mp3))
 
     
-#Initialisationblock
+#####INITBLOCK#####
 
+#score
 score = Score()
 scbar = Scorebar()
-grid = Grid(W,H)
+
+#grid
 posses = tuple(pos_gen())#all (x,y) pairs of the grid
+grid = Grid(W,H)
+grid.fill_random()
+grid.fill_random()
+grid.last = numpy.copy(grid.area)
+
+#sound
 sounds = Sounds()
 
 #colors
 background = P.Color("light Grey")
 base = P.Color(250, 250, 250)
-clock = P.time.Clock()
 shadow = P.Color(100, 100, 100)
-grid.fill_random()
-grid.fill_random()
+marker = P.Color(200,100,100)
+
+#surface
 text = { 2**x : F.render(str(2**x), 1, (0,0,0), base) for x in range(20)}
 freshs = { 2**x : F.render(str(2**x), 1, (127,127,127), base) for x in range(20)}
 deltas = { 2**x : F.render(str(2**x), 1, (0,0,150), base) for x in range(20)}
 
-marker = P.Color(200,100,100)
-grid.last = numpy.copy(grid.area)
+#misc
+clock = P.time.Clock()
 EM.dispatch("game_start", grid)
+
 if __name__ == "__main__":
     while 1:
+        
         #####EVENTBLOCK#####
         for e in P.event.get():
             if e.type == P.QUIT:
@@ -213,10 +223,12 @@ if __name__ == "__main__":
                     if grid.move(direction-1):
                         grid.fill_random()
                     print(score)
+                    
         #####LOGICBLOCK#####
         EM.dispatch("game_logic_start", grid)
+        
         #####RENDERBLOCK#####
-        D.fill(background)
+        #D.fill(background)
         D.blit(bgD, (0,0))
         EM.dispatch("game_frame_start", D)
         delta = grid.area != grid.last #elementwise check for matrix
