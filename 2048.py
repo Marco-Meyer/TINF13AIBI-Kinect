@@ -46,11 +46,13 @@ print(EM)
 ##################
 
 class Sounds():
+    def __init__(self):
+        self.sounds = {}
     def load_sound(file, path ="Sounds", ending =".ogg"):
-        sounds[file] = P.mixer.Sound(join(path, file+ending))
+        self.sounds[file] = P.mixer.Sound(join(path, file+ending))
 
     def play_sound(name):
-        sounds[name].play()
+        self.sounds[name].play()
 
         
 class Score():
