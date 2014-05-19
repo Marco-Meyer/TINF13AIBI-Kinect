@@ -6,7 +6,7 @@ sys.path.append("Engine")
 from itertools import product
 import numpy
 from os.path import join as join
-from functools import singledispatch
+from sounds import Sounds
 P.init()
 W,H = FIELD = (4,4)
 GRID = 120#Size of grid squares
@@ -33,8 +33,6 @@ scF = P.font.Font(None, 36)#Font of Scorebar @ 36 size
 #Design&Sound
 bgU = P.image.load(join('Images', 'des1.jpg'))
 bgD = P.image.load(join('Images', 'des2.jpg'))
-#P.mixer.music.load(join('Sounds', 'Background.mp3')
-#P.mixer.music.play(-1)                                
 
 
 ####GAMEEVENTS####
@@ -45,6 +43,7 @@ eventnames = {"game_start" : "grid","game_end" : "grid","game_frame_start" : "di
 print(EM)
 ##################
 
+<<<<<<< HEAD
 class Sounds():
     def __init__(self):
         self.sounds = {}
@@ -55,6 +54,8 @@ class Sounds():
         self.sounds[name].play()
 
         
+=======
+>>>>>>> be1c8f627bfb34a389fae643d1e3f55fe71d189d
 class Score():
     def __init__(self):
         self.current = 0
@@ -64,8 +65,7 @@ class Score():
         if self.current > self.highest:
             self.highest = self.current
         return self
-    #def __repr__(self):return ("Score: %s   Highscore: %s" % (self.current, self.highest))
-
+    def __repr__(self):return ("Score: %s   Highscore: %s" % (self.current, self.highest))
 
 
 class Scorebar():
@@ -161,13 +161,11 @@ def rot90(x,y, times):
     print(x,y, "rotation")
     return rot90(H-y-1, x, times-1) if times else (x,y)
 
-
 assert(rot90(3,2,4) == (3,2))
 
 def pos_gen():
     yield from product(range(W), range(H))
 
-posses = tuple(pos_gen())
 def blit_centered(target, blitter, pos):
     """Blits blitter centered on pos onto target"""
     x,y = pos
@@ -183,29 +181,40 @@ def sounds(situation):
     P.mixer.Sound(join('Sounds', situation.mp3))
 
     
-#Initialisationblock
+#####INITBLOCK#####
 
+#score
 score = Score()
 scbar = Scorebar()
-grid = Grid(W,H)
+
+#grid
 posses = tuple(pos_gen())#all (x,y) pairs of the grid
+grid = Grid(W,H)
+grid.fill_random()
+grid.fill_random()
+grid.last = numpy.copy(grid.area)
+
+#sound
+sounds = Sounds()
 
 #colors
 background = P.Color("light Grey")
 base = P.Color(250, 250, 250)
-clock = P.time.Clock()
 shadow = P.Color(100, 100, 100)
-grid.fill_random()
-grid.fill_random()
+marker = P.Color(200,100,100)
+
+#surface
 text = { 2**x : F.render(str(2**x), 1, (0,0,0), base) for x in range(20)}
 freshs = { 2**x : F.render(str(2**x), 1, (127,127,127), base) for x in range(20)}
 deltas = { 2**x : F.render(str(2**x), 1, (0,0,150), base) for x in range(20)}
 
-marker = P.Color(200,100,100)
-grid.last = numpy.copy(grid.area)
+#misc
+clock = P.time.Clock()
 EM.dispatch("game_start", grid)
+
 if __name__ == "__main__":
     while 1:
+        
         #####EVENTBLOCK#####
         for e in P.event.get():
             if e.type == P.QUIT:
@@ -227,21 +236,14 @@ if __name__ == "__main__":
                     if grid.move(direction-1):
                         grid.fill_random()
                     print(score)
+                    
         #####LOGICBLOCK#####
         EM.dispatch("game_logic_start", grid)
+        
         #####RENDERBLOCK#####
-        D.fill(background)
+        #D.fill(background)
         D.blit(bgD, (0,0))
         EM.dispatch("game_frame_start", D)
-
-
-#load_sound("Win")
-#load_sound("Move")    
-#load_sound("Lose")
-#Sounds.play_sound("Start")
-#Sounds.load_sound("Wrong")
-
-
         delta = grid.area != grid.last #elementwise check for matrix
         for x,y in posses:
             val = grid.area[x, y]
