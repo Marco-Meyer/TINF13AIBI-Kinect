@@ -30,9 +30,9 @@ from events import Manager
 F = P.font.Font(None, 70)#System default font @ 70 size
 scF = P.font.Font(None, 36)#Font of Scorebar @ 36 size
 #Sound
-volume = 0.5
+volume = 0.5 #between 0.0 - 1.0
 
-#Design&Sound
+#Design
 bgU = P.image.load(join('Images', 'des1.jpg'))
 bgD = P.image.load(join('Images', 'des2.jpg'))
 
