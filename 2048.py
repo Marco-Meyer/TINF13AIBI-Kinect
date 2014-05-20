@@ -6,24 +6,23 @@ import sys
 sys.path.append("Engine")
 from itertools import product
 import numpy
-from functools import singledispatch
+from os.path import join
+from sounds import Sounds
 P.init()
 W,H = FIELD = (4,4)
 GRID = 120#Size of grid squares
 resw, resh = resolution = W*GRID, H*GRID
-
+#Sizes of Scorebar
 vext = 72
 vextH = vext/2
 reswH = resw/2
-
 shadowd = 4
 side = 100
-
 GRIDh = GRID//2#half the size of a grid
 GRIDv = GRIDh//2#quarter "
-
 S = P.display.set_mode((resw, resh+vext))
-D = S.subsurface((0, vext, resw, resh))
+D = S.subsurface((0,vext, resw, resh))
+#Upper Surface ('Scorebar')
 U1 = S.subsurface((0, 0, reswH, vext))
 U2 = S.subsurface((reswH, 0, reswH, vext))
 P.display.set_caption("2048 Kinergie")
@@ -33,11 +32,8 @@ F = P.font.Font(None, 70)#System default font @ 70 size
 scF = P.font.Font(None, 36)#Font of Scorebar @ 36 size
 
 #Design&Sound
-image_directory = 'Images/'
-music_directory = 'Sounds/'
-
-bgU = P.image.load(image_directory+'des1.jpg')
-bgD = P.image.load(image_directory+'des2.jpg')
+bgU = P.image.load(join('Images', 'des1.jpg'))
+bgD = P.image.load(join('Images', 'des2.jpg'))
 
 #background_m = P.mixer.music.load(music_directory+'Background.mp3')
 #start_m = P.mixer.music.load(music_directory+'Start.mp3')
@@ -57,6 +53,7 @@ print(EM)
 
 class Score():
     def __init__(self):
+        
         self.current = 0
         self.highest = 0
     def __iadd__(self, other):
@@ -64,6 +61,8 @@ class Score():
         if self.current > self.highest:
             self.highest = self.current
         return self
+    def __repr__(self):return ("Score: %s   Highscore: %s" % (self.current, self.highest))
+
 
 class Scorebar():
     def __init__(self):
@@ -132,9 +131,9 @@ class Grid():
         val = slice[x]
         for xi in range(x+1, W):
             if slice[xi] == val and xi not in blocked:#not already merged and has to be equal
-                slice[xi] = val*2
+                slice[xi] = val*2 
                 slice[x] = 0
-                addscore(val*2)#Adds won points to score
+                addscore(val*2)
                 blocked.add(xi)#prevent multiple merges per movement
                 movement = True
                 break
@@ -149,7 +148,7 @@ class Grid():
         if direction:self.area = numpy.rot90(self.area, direction)
         moves = False
         for y in range(H):
-            if self.move_slice(self.area[:, y]): moves = True
+            if self.move_slice(self.area[:, y]): moves = True            
         if direction:self.area = numpy.rot90(self.area, 4-direction)
         return moves
 
@@ -157,7 +156,6 @@ def rot90(x,y, times):
     #not sure if it's working
     print(x,y, "rotation")
     return rot90(H-y-1, x, times-1) if times else (x,y)
-
 
 assert(rot90(3,2,4) == (3,2))
 
@@ -174,37 +172,51 @@ def addscore(points):
     global score
     score += points
     scbar.refresh()#refreshes the scorebar with current score
+    
+def sounds(situation):
+    P.mixer.Sound(join('Sounds', situation.mp3))
 
 def check_merge(grid):
     grid_twit = copy.deepcopy(grid)
-    for d in range(4):
-        grid_twit.move(d)
-        if numpy.array_equal(grid_twit.area, grid.area): return False
+    for d in range(1):
+        grid_twit.move(1)
+    if numpy.array_equal(grid_twit.area, grid.area): return False
     return True
+    
+#####INITBLOCK#####
 
-#Initialisationblock
-
+#score
 score = Score()
 scbar = Scorebar()
-grid = Grid(W,H)
+
+#grid
 posses = tuple(pos_gen())#all (x,y) pairs of the grid
-    
+grid = Grid(W,H)
+grid.fill_random()
+grid.fill_random()
+grid.last = numpy.copy(grid.area)
+
+#sound
+sounds = Sounds()
+
 #colors
-background = P.Color("light grey")
+background = P.Color("light Grey")
 base = P.Color(250, 250, 250)
-clock = P.time.Clock()
 shadow = P.Color(100, 100, 100)
-grid.fill_random()
-grid.fill_random()
+marker = P.Color(200,100,100)
+
+#surface
 text = { 2**x : F.render(str(2**x), 1, (0,0,0), base) for x in range(20)}
 freshs = { 2**x : F.render(str(2**x), 1, (127,127,127), base) for x in range(20)}
 deltas = { 2**x : F.render(str(2**x), 1, (0,0,150), base) for x in range(20)}
 
-marker = P.Color(200,100,100)
-grid.last = numpy.copy(grid.area)
+#misc
+clock = P.time.Clock()
 EM.dispatch("game_start", grid)
+
 if __name__ == "__main__":
     while 1:
+        
         #####EVENTBLOCK#####
         for e in P.event.get():
             if e.type == P.QUIT:
@@ -225,16 +237,17 @@ if __name__ == "__main__":
                     grid.last = numpy.copy(grid.area)
                     if grid.move(direction-1):
                         grid.fill_random()
-                        print (check_merge(grid))
+                        if grid.area.all():
+                            print (check_merge(grid))
                         
                     
         #####LOGICBLOCK#####
         EM.dispatch("game_logic_start", grid)
+        
         #####RENDERBLOCK#####
-        D.fill(background)
+        #D.fill(background)
         D.blit(bgD, (0,0))
         EM.dispatch("game_frame_start", D)
-
         delta = grid.area != grid.last #elementwise check for matrix
         for x,y in posses:
             val = grid.area[x, y]
