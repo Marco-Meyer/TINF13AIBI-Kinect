@@ -43,19 +43,7 @@ eventnames = {"game_start" : "grid","game_end" : "grid","game_frame_start" : "di
 print(EM)
 ##################
 
-<<<<<<< HEAD
-class Sounds():
-    def __init__(self):
-        self.sounds = {}
-    def load_sound(file, path ="Sounds", ending =".ogg"):
-        self.sounds[file] = P.mixer.Sound(join(path, file+ending))
 
-    def play_sound(name):
-        self.sounds[name].play()
-
-        
-=======
->>>>>>> be1c8f627bfb34a389fae643d1e3f55fe71d189d
 class Score():
     def __init__(self):
         self.current = 0
