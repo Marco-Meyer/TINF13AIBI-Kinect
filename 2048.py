@@ -29,6 +29,8 @@ P.display.set_caption("2048 Kinergie")
 from events import Manager
 F = P.font.Font(None, 70)#System default font @ 70 size
 scF = P.font.Font(None, 36)#Font of Scorebar @ 36 size
+#Sound
+volume = 0.5
 
 #Design&Sound
 bgU = P.image.load(join('Images', 'des1.jpg'))
@@ -229,8 +231,8 @@ if __name__ == "__main__":
         EM.dispatch("game_logic_start", grid)
         sounds.load_sound("Start")
         sounds.play_sound("Start")
-        sounds.sound_volume("Start", 0.5)
-        sounds.sound_stop("Start")
+        sounds.sound_volume("Start", volume)
+        #sounds.sound_stop("Start")
         #####RENDERBLOCK#####
         #D.fill(background)
         D.blit(bgD, (0,0))
