@@ -227,7 +227,10 @@ if __name__ == "__main__":
                     
         #####LOGICBLOCK#####
         EM.dispatch("game_logic_start", grid)
-        
+        Sounds.load_sound("Start")
+        Sounds.play_sound("Start")
+        P.mixer.Sound.set_volume(2)
+        P.mixer.Sound.stop
         #####RENDERBLOCK#####
         #D.fill(background)
         D.blit(bgD, (0,0))
