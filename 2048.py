@@ -33,6 +33,7 @@ P.display.set_caption("2048 Kinergie")
 from events import Manager
 F = P.font.Font(None, 70)#System default font @ 70 size
 scF = P.font.Font(None, 36)#Font of Scorebar @ 36 size
+
 #Sound
 volume = 0.5 #between 0.0 - 1.0
 sound_time = 0.1
@@ -66,6 +67,7 @@ class Score():
     def next_Round(self):
         self.current = 0
         scbar.refresh()
+
 
 
 class Scorebar():
@@ -168,10 +170,19 @@ class Grid():
         self.fill_random()
         self.fill_random()
 
+
 def rot90(x,y, times):
     #not sure if it's working
     print(x,y, "rotation")
     return rot90(H-y-1, x, times-1) if times else (x,y)
+
+def new_Round():
+    global gameover
+    gameover = False
+    score.next_Round()
+    grid.reset()
+
+
 
 assert(rot90(3,2,4) == (3,2))
 
@@ -188,16 +199,10 @@ def addscore(points):
     global score
     score += points
     scbar.refresh()#refreshes the scorebar with current score
+    
 
-def new_Round():
-    global gameover
-    gameover = False
-    score.next_Round()
-    grid.reset()
+
     
-    
-def sounds(situation):
-    P.mixer.Sound(join('Sounds', situation.mp3))   
     
 #####INITBLOCK#####
 
@@ -264,7 +269,7 @@ if __name__ == "__main__":
                             if not grid.check_merge():
                                 gameover = True
             elif e.type == P.KEYDOWN and gameover:
-                new_Round()
+               new_Round()
                     
         #####LOGICBLOCK#####
         EM.dispatch("game_logic_start", grid)

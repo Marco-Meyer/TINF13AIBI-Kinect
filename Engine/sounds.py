@@ -1,9 +1,18 @@
 from os.path import join
 import pygame as P
 from threading import Timer
+import os
+import time
+
 class Sounds():
     def __init__(self):
         self.sounds = {}
+        self.filenames = os.listdir("Sounds")
+        for filename in self.filenames:
+            base, ending = filename.split(".")
+            print(base, ending)
+            self.load_sound(base, ending = "." + ending)
+            
     def load_sound(self, file, path ="Sounds", ending =".ogg"):
         self.sounds[file] = P.mixer.Sound(join(path, file+ending))
 
@@ -18,4 +27,12 @@ class Sounds():
 
     def sound_stop(self, name):
         self.sounds[name].stop()
-    
+##    
+##if __name__ == "__main__":
+##    P.init()
+##    P.display.set_mode([10,10])
+##    import sys
+##    os.chdir("./../")
+##    print(os.getcwd())
+##    sounds = Sounds()
+##    print(sounds.filenames)
