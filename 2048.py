@@ -6,6 +6,7 @@ sys.path.append("Engine")
 from itertools import product
 import numpy
 from os.path import join
+
 from sounds import Sounds
 import copy
  
@@ -32,6 +33,7 @@ P.display.set_caption("2048 Kinergie")
 from events import Manager
 F = P.font.Font(None, 70)#System default font @ 70 size
 scF = P.font.Font(None, 36)#Font of Scorebar @ 36 size
+
 #Sound
 volume = 0.5 #between 0.0 - 1.0
 sound_time = 0.1
