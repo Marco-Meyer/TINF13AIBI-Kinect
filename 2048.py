@@ -260,7 +260,7 @@ if __name__ == "__main__":
                     grid.last = numpy.copy(grid.area)
                     if grid.move(direction-1):
                         grid.fill_random()
-                        if grid.area.all():
+                        if grid.area.all() and not gameover:#grid full and not yet gameover
                             if not grid.check_merge():
                                 gameover = True
             elif e.type == P.KEYDOWN and gameover:
