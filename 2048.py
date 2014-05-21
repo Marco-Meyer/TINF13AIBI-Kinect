@@ -1,13 +1,13 @@
 import pygame as P
 from random import *
 from array import array
-import copy
 import sys
 sys.path.append("Engine")
 from itertools import product
 import numpy
 from os.path import join
 from sounds import Sounds
+ 
 P.init()
 gameover = False
 W,H = FIELD = (4,4)
@@ -31,18 +31,15 @@ P.display.set_caption("2048 Kinergie")
 from events import Manager
 F = P.font.Font(None, 70)#System default font @ 70 size
 scF = P.font.Font(None, 36)#Font of Scorebar @ 36 size
+#Sound
+volume = 0.5 #between 0.0 - 1.0
+sound_time = 0.1
 
-#Design&Sound
+
+#Design
 bgU = P.image.load(join('Images', 'des1.jpg'))
 bgD = P.image.load(join('Images', 'des2.jpg'))
 
-#background_m = P.mixer.music.load(music_directory+'Background.mp3')
-#start_m = P.mixer.music.load(music_directory+'Start.mp3')
-#win_m = P.mixer.music.load(music_directory+'Win.mp3')
-#lose_m = P.mixer.music.load(music_directory+'Lose.mp3')
-#slide_m = P.mixer.music.load(music_directory+'Slide.mp3')
-#wrong_m = P.mixer.music.load(music_directory+'Wrong.mp3')
-#background_m = P.mixer.music.load(music_directory+'Background.mp3')
 
 ####GAMEEVENTS####
 EM = Manager()
@@ -51,6 +48,7 @@ eventnames = {"game_start" : "grid","game_end" : "grid","game_frame_start" : "di
 [EM.register_event(name, argnames = args) for name, args in eventnames.items()]
 print(EM)
 ##################
+
 
 class Score():
     def __init__(self):
@@ -177,12 +175,14 @@ def addscore(points):
 def sounds(situation):
     P.mixer.Sound(join('Sounds', situation.mp3))
 
+
 def check_merge(grid):
     grid_twit = copy.deepcopy(grid)
     grid_twit.move(1)
     grid_twit.move(2)
     if numpy.array_equal(grid_twit.area, grid.area): return False
     return True
+
     
     
 #####INITBLOCK#####
@@ -247,15 +247,20 @@ if __name__ == "__main__":
                     if grid.move(direction-1):
                         grid.fill_random()
                         if grid.area.all():
+<<<<<<< HEAD
                             if not check_merge(grid):
                                 gameover = True
             elif e.type == P.KEYDOWN and gameover:
                 print ("NÄCHSTE RUNDE")
                         
+=======
+                            print (check_merge(grid))
+
+>>>>>>> 86343a6f4c1d814082596f0e005e19feb6ce5485
                     
         #####LOGICBLOCK#####
         EM.dispatch("game_logic_start", grid)
-        
+
         #####RENDERBLOCK#####
         #D.fill(background)
         D.blit(bgD, (0,0))
@@ -277,5 +282,3 @@ if __name__ == "__main__":
         EM.dispatch("game_frame_end", D)
         P.display.flip()
         clock.tick(60)
-
-
