@@ -40,7 +40,7 @@ sound_time = 0.1
 
 #Design
 bgU = P.image.load(join('Images', 'des1.jpg'))
-bgD = P.image.load(join('Images', 'des2.jpg'))
+bgD = P.image.load(join('Images', 'background.png'))
 
 
 ####GAMEEVENTS####
