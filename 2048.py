@@ -247,16 +247,10 @@ if __name__ == "__main__":
                     if grid.move(direction-1):
                         grid.fill_random()
                         if grid.area.all():
-<<<<<<< HEAD
                             if not check_merge(grid):
                                 gameover = True
             elif e.type == P.KEYDOWN and gameover:
                 print ("NÄCHSTE RUNDE")
-                        
-=======
-                            print (check_merge(grid))
-
->>>>>>> 86343a6f4c1d814082596f0e005e19feb6ce5485
                     
         #####LOGICBLOCK#####
         EM.dispatch("game_logic_start", grid)
