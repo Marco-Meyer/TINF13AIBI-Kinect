@@ -59,10 +59,13 @@ class Score():
         self.highest = 0
     def __iadd__(self, other):
         self.current += other
-        if self.current > self.highest:
-            self.highest = self.current
+        self.highest = max(self.highest, self.current)
         return self
-    def __repr__(self):return ("Score: %s   Highscore: %s" % (self.current, self.highest))
+    def __repr__(self):
+        return ("Score: %s   Highscore: %s" % (self.current, self.highest))
+    def next_Round(self):
+        self.current = 0
+        scbar.refresh()
 
 
 class Scorebar():
@@ -153,6 +156,18 @@ class Grid():
         if direction:self.area = numpy.rot90(self.area, 4-direction)
         return moves
 
+    def check_merge(self):
+        grid_twit = copy.deepcopy(self)
+        grid_twit.move(1)
+        grid_twit.move(2)
+        if numpy.array_equal(grid_twit.area, self.area): return False
+        return True
+
+    def reset(self):
+        self.area = numpy.zeros((self.x,self.y),numpy.int32)
+        self.fill_random()
+        self.fill_random()
+
 def rot90(x,y, times):
     #not sure if it's working
     print(x,y, "rotation")
@@ -173,19 +188,16 @@ def addscore(points):
     global score
     score += points
     scbar.refresh()#refreshes the scorebar with current score
+
+def new_Round():
+    global gameover
+    gameover = False
+    score.next_Round()
+    grid.reset()
+    
     
 def sounds(situation):
-    P.mixer.Sound(join('Sounds', situation.mp3))
-
-
-def check_merge(grid):
-    grid_twit = copy.deepcopy(grid)
-    grid_twit.move(1)
-    grid_twit.move(2)
-    if numpy.array_equal(grid_twit.area, grid.area): return False
-    return True
-
-    
+    P.mixer.Sound(join('Sounds', situation.mp3))   
     
 #####INITBLOCK#####
 
@@ -249,10 +261,10 @@ if __name__ == "__main__":
                     if grid.move(direction-1):
                         grid.fill_random()
                         if grid.area.all():
-                            if not check_merge(grid):
+                            if not grid.check_merge():
                                 gameover = True
             elif e.type == P.KEYDOWN and gameover:
-                print ("NÄCHSTE RUNDE")
+                new_Round()
                     
         #####LOGICBLOCK#####
         EM.dispatch("game_logic_start", grid)
