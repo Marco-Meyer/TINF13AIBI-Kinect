@@ -7,6 +7,7 @@ from itertools import product
 import numpy
 from os.path import join
 from sounds import Sounds
+import copy
  
 P.init()
 gameover = False
