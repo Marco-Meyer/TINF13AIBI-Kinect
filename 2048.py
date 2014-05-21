@@ -24,7 +24,7 @@ side = 100
 GRIDh = GRID//2#half the size of a grid
 GRIDv = GRIDh//2#quarter "
 S = P.display.set_mode((resw, resh+vext))
-D = S.subsurface((0,vext, resw, resh))
+D = Sfrom os import dir as osdir.subsurface((0,vext, resw, resh))
 #Upper Surface ('Scorebar')
 U1 = S.subsurface((0, 0, reswH, vext))
 U2 = S.subsurface((reswH, 0, reswH, vext))
@@ -175,9 +175,6 @@ def addscore(points):
     score += points
     scbar.refresh()#refreshes the scorebar with current score
     
-def sounds(situation):
-    P.mixer.Sound(join('Sounds', situation.mp3))
-
 
 def check_merge(grid):
     grid_twit = copy.deepcopy(grid)

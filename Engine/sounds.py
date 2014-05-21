@@ -12,9 +12,7 @@ class Sounds():
             base, ending = filename.split(".")
             print(base, ending)
             self.load_sound(base, ending = "." + ending)
-            self.play_sound(base)
-            self.sound_volume(base, 1.0)
-            time.sleep(5)
+            
     def load_sound(self, file, path ="Sounds", ending =".ogg"):
         self.sounds[file] = P.mixer.Sound(join(path, file+ending))
 
@@ -29,11 +27,12 @@ class Sounds():
 
     def sound_stop(self, name):
         self.sounds[name].stop()
-    
-if __name__ == "__main__":
-    P.init()
-    import sys
-    os.chdir("./../")
-    print(os.getcwd())
-    sounds = Sounds()
-    print(sounds.filenames)
+##    
+##if __name__ == "__main__":
+##    P.init()
+##    P.display.set_mode([10,10])
+##    import sys
+##    os.chdir("./../")
+##    print(os.getcwd())
+##    sounds = Sounds()
+##    print(sounds.filenames)
