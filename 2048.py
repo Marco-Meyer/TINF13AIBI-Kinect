@@ -9,7 +9,10 @@ import numpy
 from os.path import join
 from sounds import Sounds
 import copy
- 
+
+from score import Score
+from grid import Grid
+
 P.init()
 gameover = False
 W,H = FIELD = (4,4)
@@ -52,24 +55,6 @@ eventnames = {"game_start" : "grid","game_end" : "grid","game_frame_start" : "di
 print(EM)
 ##################
 
-
-class Score():
-    def __init__(self):
-        
-        self.current = 0
-        self.highest = 0
-    def __iadd__(self, other):
-        self.current += other
-        self.highest = max(self.highest, self.current)
-        return self
-    def __repr__(self):
-        return ("Score: %s   Highscore: %s" % (self.current, self.highest))
-    def next_Round(self):
-        self.current = 0
-        scbar.refresh()
-
-
-
 class Scorebar():
     def __init__(self):
         self.refresh()
@@ -85,91 +70,6 @@ class Scorebar():
         advHig = scF.render("%s" % (score.highest), True, (255, 255, 255))
         blit_centered(U1, advCur, (reswH/2, vextH/3*4))
         blit_centered(U2, advHig, (reswH/2, vextH/3*4))
-
-class Grid():
-    def __init__(self, x,y):
-        self.x = x
-        self.y = y
-        #grid data is saved in a numpy 2d array
-        self.area = numpy.zeros((x,y),numpy.int32)
-        #new tiles
-        self.fresh = set()
-        
-    def fill_random(self):
-        """Fills in a random position with 2 or 4
-        returns True if a spot was found."""
-        for x,y in posses:
-            if not self.area[x, y]:
-                break
-        else:
-            return False#if the entire grid is full
-        x,y = randint(0,W-1),randint(0,H-1)
-        while self.area[x, y]:
-            x,y = randint(0,W-1),randint(0,H-1)
-        self.area[x, y] = 2 if randint(0,3) else 4#25% chance for a 4
-        self.fresh.add((x,y))
-        return True
-    
-    def move_slice(self, slice):
-        """Merges and Moves all Tiles to the right in a horizontal slice"""
-        movement = False
-        blocked = set()
-
-        #check the slice for merges
-        for x in range(W-1, -1, -1):
-            if slice[x]:
-                if self.merge_point(x, slice, blocked):movement = True
-        #move everything to the right
-        innermove = True
-        while innermove:
-            innermove = False
-            for x in range(W-2, -1, -1):
-                if slice[x] and not slice[x+1]:
-                    slice[x+1] = slice[x]
-                    slice[x] = 0
-                    movement = True
-                    innermove = True
-        return movement
-    
-    def merge_point(self, x, slice, blocked):
-        """Checks the Tile for mergability"""
-        movement = False
-        val = slice[x]
-        for xi in range(x+1, W):
-            if slice[xi] == val and xi not in blocked:#not already merged and has to be equal
-                slice[xi] = val*2 
-                slice[x] = 0
-                addscore(val*2)
-                blocked.add(xi)#prevent multiple merges per movement
-                movement = True
-                break
-            elif slice[xi]:#different number
-                break
-        return movement
-    
-    def move(self, direction = 0):
-        """Moves the entire Grid in direction"""
-        EM.dispatch("movement_start", self, direction)
-        used = set()
-        if direction:self.area = numpy.rot90(self.area, direction)
-        moves = False
-        for y in range(H):
-            if self.move_slice(self.area[:, y]): moves = True            
-        if direction:self.area = numpy.rot90(self.area, 4-direction)
-        return moves
-
-    def check_merge(self):
-        grid_twit = copy.deepcopy(self)
-        grid_twit.move(1)
-        grid_twit.move(2)
-        if numpy.array_equal(grid_twit.area, self.area): return False
-        return True
-
-    def reset(self):
-        self.area = numpy.zeros((self.x,self.y),numpy.int32)
-        self.fill_random()
-        self.fill_random()
-
 
 def rot90(x,y, times):
     #not sure if it's working
@@ -212,10 +112,7 @@ scbar = Scorebar()
 
 #grid
 posses = tuple(pos_gen())#all (x,y) pairs of the grid
-grid = Grid(W,H)
-grid.fill_random()
-grid.fill_random()
-grid.last = numpy.copy(grid.area)
+grid = Grid(W,H, addscore)
 
 #sound
 sounds = Sounds()
@@ -263,6 +160,7 @@ if __name__ == "__main__":
                 if direction:
                     grid.fresh = set()
                     grid.last = numpy.copy(grid.area)
+                    EM.dispatch("movement_start", grid, direction-1)
                     if grid.move(direction-1):
                         grid.fill_random()
                         if grid.area.all() and not gameover:#grid full and not yet gameover
