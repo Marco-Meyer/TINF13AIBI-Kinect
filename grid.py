@@ -4,8 +4,7 @@ from random import randint
 import copy
 
 class Grid():
-    def __init__(self, x,y, scorecallback):
-        self.scorecallback = scorecallback
+    def __init__(self, x,y):
         self.x = x
         self.y = y
         self.posses = tuple(product(range(x), range(y)))
@@ -60,7 +59,7 @@ class Grid():
             if slice[xi] == val and xi not in blocked:#not already merged and has to be equal
                 slice[xi] = val*2 
                 slice[x] = 0
-                self.scorecallback(val*2)
+                self.addscore(val*2)
                 blocked.add(xi)#prevent multiple merges per movement
                 movement = True
                 break
@@ -84,6 +83,10 @@ class Grid():
         grid_twit.move(2)
         if numpy.array_equal(grid_twit.area, self.area): return False
         return True
+
+    def addscore(self, points):
+        self.game.score += points
+        self.game.scbar.refresh()#refreshes the scorebar with current score
 
     def reset(self):
         self.area = numpy.zeros((self.x,self.y),numpy.int32)

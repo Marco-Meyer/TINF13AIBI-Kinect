@@ -13,6 +13,15 @@ import copy
 from score import Score
 from grid import Grid
 
+class Game():
+    def __init__(self, grid, score, scorebar):
+        self.grid = grid
+        grid.game = self
+        self.score = score
+        score.game = self
+        self.scbar = scorebar
+        scorebar.game = self
+        
 P.init()
 gameover = False
 W,H = FIELD = (4,4)
@@ -82,8 +91,6 @@ def new_Round():
     score.next_Round()
     grid.reset()
 
-
-
 assert(rot90(3,2,4) == (3,2))
 
 def pos_gen():
@@ -94,15 +101,6 @@ def blit_centered(target, blitter, pos):
     x,y = pos
     xd, yd = blitter.get_size()
     target.blit(blitter, (x-xd//2,y-yd//2))
-
-def addscore(points):
-    global score
-    score += points
-    scbar.refresh()#refreshes the scorebar with current score
-    
-
-
-    
     
 #####INITBLOCK#####
 
@@ -112,7 +110,10 @@ scbar = Scorebar()
 
 #grid
 posses = tuple(pos_gen())#all (x,y) pairs of the grid
-grid = Grid(W,H, addscore)
+grid = Grid(W,H)
+
+#game
+game = Game(grid, score, scbar)
 
 #sound
 sounds = Sounds()

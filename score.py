@@ -12,4 +12,4 @@ class Score():
         return ("Score: %s   Highscore: %s" % (self.current, self.highest))
     def next_Round(self):
         self.current = 0
-        scbar.refresh()
+        self.game.scbar.refresh()
