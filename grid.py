@@ -2,6 +2,11 @@ import numpy
 from itertools import product
 from random import randint
 import copy
+import sys
+sys.path.append("Engine")
+from sounds import Sounds 
+
+#sounds = Sounds()
 
 class Grid():
     def __init__(self, x,y):
@@ -14,7 +19,7 @@ class Grid():
         self.fill_random()
         self.fill_random()
         self.last = numpy.copy(self.area)
-        
+
     def fill_random(self):
         """Fills in a random position with 2 or 4
         returns True if a spot was found."""
@@ -73,7 +78,11 @@ class Grid():
         if direction:self.area = numpy.rot90(self.area, direction)
         moves = False
         for y in range(self.y):
-            if self.move_slice(self.area[:, y]): moves = True            
+            if self.move_slice(self.area[:, y]):
+                moves = True
+                #sounds.timer_stop("Slide", 0.1)
+                sounds.play_sound("Slide")
+
         if direction:self.area = numpy.rot90(self.area, 4-direction)
         return moves
 
