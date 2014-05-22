@@ -10,7 +10,7 @@ class Sounds():
         self.filenames = os.listdir("Sounds")
         for filename in self.filenames:
             base, ending = filename.split(".")
-            print(base, ending)
+            print("Loaded "+base, ending)
             self.load_sound(base, ending = "." + ending)
             
     def load_sound(self, file, path ="Sounds", ending =".ogg"):

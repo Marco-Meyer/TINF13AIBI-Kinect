@@ -141,6 +141,7 @@ clock = P.time.Clock()
 EM.dispatch("game_start", grid)
 
 if __name__ == "__main__":
+    ############Background#############
     while 1:
         
         #####EVENTBLOCK#####
@@ -164,9 +165,10 @@ if __name__ == "__main__":
                     EM.dispatch("movement_start", grid, direction-1)
                     if grid.move(direction-1):
                         grid.fill_random()
+                        ###########Slide############
                         if grid.area.all() and not gameover:#grid full and not yet gameover
                             if not grid.check_merge():
-                                gameover = True
+                                gameover = True                              
             elif e.type == P.KEYDOWN and gameover:
                new_Round()
                     
