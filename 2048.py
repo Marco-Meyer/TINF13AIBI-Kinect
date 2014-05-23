@@ -54,7 +54,7 @@ sound_time = 0.1
 
 
 #Design
-bgU = P.image.load(join('Images', 'des1.jpg'))
+bgU = P.image.load(join('Images', 'monitor.png'))
 bgD = P.image.load(join('Images', 'background.png'))
 
 
@@ -72,15 +72,15 @@ class Scorebar():
     def refresh(self):
         U1.blit(bgU, (0,0))
         U2.blit(bgU, (0,0))
-        self.labCur = scF.render("Score:", True, (255, 255, 255))
-        self.labHig = scF.render("Highscore:", True, (255, 255, 255))
-        blit_centered(U1, self.labCur, (reswH/2, vextH/3))
-        blit_centered(U2, self.labHig, (reswH/2, vextH/3))
+        self.labCur = scF.render("Score", True, (61, 61, 61))
+        self.labHig = scF.render("Highscore", True, (61, 61, 61))
+        blit_centered(U1, self.labCur, (reswH/2, vextH/3+10))
+        blit_centered(U2, self.labHig, (reswH/2, vextH/3+10))
 
         advCur = scF.render("%s" % (score.current), True, (255, 255, 255))
         advHig = scF.render("%s" % (score.highest), True, (255, 255, 255))
-        blit_centered(U1, advCur, (reswH/2, vextH/3*4))
-        blit_centered(U2, advHig, (reswH/2, vextH/3*4))
+        blit_centered(U1, advCur, (reswH/2, vextH/3*4-5))
+        blit_centered(U2, advHig, (reswH/2, vextH/3*4-5))
 
 def rot90(x,y, times):
     #not sure if it's working
