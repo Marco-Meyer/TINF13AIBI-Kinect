@@ -5,41 +5,37 @@ class Chip():
     def __init__(self, length, connector, innercolor = P.Color(50,50,50), deviation = 3, bordercolor = P.Color(150,150,150)):
         size = length,length
         
-        self.rect = P.Rect((0,0), size)
-        self.innerrect = self.rect.inflate(-connector.indent*2,-connector.indent*2)
+        rect = P.Rect((0,0), size)
+        innerrect = rect.inflate(-connector.indent*2,-connector.indent*2)
         self.surface = P.Surface(size, flags = P.SRCALPHA)
         self.surface.fill((0,0,0,0))
         
-        self.insurface = self.surface.subsurface(self.innerrect)#P.Surface(self.innerrect.size)
-        for x in range(self.insurface.get_width()):
-            for y in range(self.insurface.get_height()):
-                self.insurface.set_at((x,y),[x+randint(-deviation, deviation) for x in innercolor[:3]])
-        innerlength = self.innerrect.width
+        insurface = self.surface.subsurface(innerrect)#P.Surface(self.innerrect.size)
+        for x in range(insurface.get_width()):
+            for y in range(insurface.get_height()):
+                insurface.set_at((x,y),[x+randint(-deviation, deviation) for x in innercolor[:3]])
+        innerlength = innerrect.width
         ele = (connector.spacing+connector.width)
         
         slots = innerlength//ele-2
         filled = slots*ele-connector.spacing
         rest = innerlength - filled
-        dif = rest//2
-        
         if rest%2:
             print("Warning|electronics.py:could not center chip connectors, change chip size.")
             
-        con = connector.surfaces[1]
-        con2 = connector.surfaces[3]
-        posses = tuple(range(dif, innerlength-dif, ele))
+        con1,con2,con3,con4 = connector.surfaces
+        posses = tuple(range(rest//2, innerlength-rest//2, ele))
         y = length-connector.length
         for x in posses:
             mx = connector.indent+x
-            self.surface.blit(con,(mx,0))
-            self.surface.blit(con2,(mx,y))
-        con = connector.surfaces[0]
-        con2 = connector.surfaces[2]
-        x = length-connector.length
-        for y in posses:
-            my = connector.indent+y
-            self.surface.blit(con, (0, my))
-            self.surface.blit(con2, (x, my))
+            
+            self.surface.blit(con2,(mx,0))#top
+            self.surface.blit(con4,(mx,y))#bottom
+            
+            self.surface.blit(con1, (0, mx))#left
+            self.surface.blit(con3, (y, mx))#right
+
+
 
 def create_conductor(length, width, light = (200,200,200), dark = (127,127,127)):
     l = length//3
