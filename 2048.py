@@ -9,7 +9,7 @@ import numpy
 from os.path import join
 from sounds import Sounds
 import copy
-
+from Circuit import electronics
 from score import Score
 from grid import Grid
 
@@ -25,17 +25,19 @@ class Game():
 P.init()
 gameover = False
 W,H = FIELD = (4,4)
-GRID = 120#Size of grid squares
+GRID = 150#Size of grid squares
 resw, resh = resolution = W*GRID, H*GRID
 #Sizes of Scorebar
-vext = 72
+vext = 110
 vextH = vext/2
 reswH = resw/2
 shadowd = 4
 side = 100
 GRIDh = GRID//2#half the size of a grid
 GRIDv = GRIDh//2#quarter "
-S = P.display.set_mode((resw, resh+vext))
+pixels = (resw, resh+vext)
+S = P.display.set_mode(pixels)
+print("Resolution:",pixels)
 D = S.subsurface((0,vext, resw, resh))
 #Upper Surface ('Scorebar')
 U1 = S.subsurface((0, 0, reswH, vext))
@@ -104,6 +106,16 @@ def blit_centered(target, blitter, pos):
     
 #####INITBLOCK#####
 
+#electronics
+connectors = electronics.Connector(3,10,3)
+chip = electronics.Chip(98, connectors)
+xdelta = resw//5
+centers = []
+for x in range(xdelta,resw,xdelta):
+    for y in range(xdelta,resh,xdelta):
+        centers.append((x,y))
+elegrid = electronics.Grid(resolution, chip, connectors, centers)
+
 #score
 score = Score()
 scbar = Scorebar()
@@ -126,9 +138,9 @@ marker = P.Color(200,100,100)
 gocolor = P.Color(255, 0, 0, 100)
 
 #surface
-text = { 2**x : F.render(str(2**x), 1, (0,0,0), base) for x in range(20)}
-freshs = { 2**x : F.render(str(2**x), 1, (127,127,127), base) for x in range(20)}
-deltas = { 2**x : F.render(str(2**x), 1, (0,0,150), base) for x in range(20)}
+text = { 2**x : F.render(str(2**x), 1, (0,0,0)) for x in range(20)}
+freshs = { 2**x : F.render(str(2**x), 1, (127,127,127)) for x in range(20)}
+deltas = { 2**x : F.render(str(2**x), 1, (0,0,150)) for x in range(20)}
 
 #Game Over-Surface
 GO = P.Surface((resw, resh), P.SRCALPHA)
@@ -175,17 +187,17 @@ if __name__ == "__main__":
 
         #####RENDERBLOCK#####
         #D.fill(background)
-        D.blit(bgD, (0,0))
+        D.blit(elegrid.surface, (0,0))
         EM.dispatch("game_frame_start", D)
         delta = grid.area != grid.last #elementwise check for matrix
-        for x,y in posses:
+        for (x,y), pos in zip(posses,centers):
             val = grid.area[x, y]
-            rectshadow = x*GRID+GRIDh-side/2+shadowd, y*GRID+GRIDh-side/2+shadowd, side, side
-            P.draw.rect(D, shadow, rectshadow, 0)
-            rect = x*GRID+GRIDh-side/2, y*GRID+GRIDh-side/2, side, side
-            P.draw.rect(D, base, rect, 0)
+            #rectshadow = x*GRID+GRIDh-side/2+shadowd, y*GRID+GRIDh-side/2+shadowd, side, side
+            #P.draw.rect(D, shadow, rectshadow, 0)
+            #rect = x*GRID+GRIDh-side/2, y*GRID+GRIDh-side/2, side, side
+            #P.draw.rect(D, base, rect, 0)
             if val:
-                pos = x*GRID+GRIDh,y*GRID+GRIDh
+                #pos = x*GRID+GRIDh,y*GRID+GRIDh
                 if (x,y) in grid.fresh:blit_centered(D, freshs[val],pos)
                 elif delta[x,y]:blit_centered(D, deltas[val],pos)
                 else:blit_centered(D, text[val],pos)
