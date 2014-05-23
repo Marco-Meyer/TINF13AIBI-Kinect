@@ -32,10 +32,21 @@ class Chip():
             self.surface.blit(con2,(mx,0))#top
             self.surface.blit(con4,(mx,y))#bottom
             
-            self.surface.blit(con1, (0, mx))#left
-            self.surface.blit(con3, (y, mx))#right
-
-
+            self.surface.blit(con3, (0, mx))#left
+            self.surface.blit(con1, (y, mx))#right
+            
+        self.interfaces = posses#attachement nodes for circuit
+    
+        
+class Grid():
+    def __init__(self, size, chip, connector, positions):
+        self.size = size
+        self.chip = chip
+        self.length = connector.width+connector.spacing
+        self.surface = P.Surface(size)
+        xshift = self.chip.surface.get_width()//2
+        for x,y in positions:
+            self.surface.blit(chip.surface, (x-xshift, y-xshift))
 
 def create_conductor(length, width, light = (200,200,200), dark = (127,127,127)):
     l = length//3
@@ -63,7 +74,17 @@ class Connector():
         self.surfaces = get_rotated_conductors(length, width, light, dark)
 
 if __name__ == "__main__":
+    P.init()
     connectors = Connector(3,10,3)
-    chip = Chip(59, connectors)
-    P.image.save(chip.surface, "test.png")
+    chip = Chip(78, connectors)
+    #P.image.save(chip.surface, "test.png")
     P.image.save(create_conductor(20,4), "conductor.png")
+    size = (480, 480)
+    xdelta = size[0]//5
+    positions = []
+    for x in range(xdelta,size[0],xdelta):
+        for y in range(xdelta,size[1],xdelta):
+            print(x,y)
+            positions.append((x,y))
+    grid = Grid(size, chip, connectors, positions)
+    P.image.save(grid.surface, "test.png")
