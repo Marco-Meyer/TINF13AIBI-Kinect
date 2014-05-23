@@ -61,4 +61,4 @@ class LCD():
 
 if __name__ == "__main__":
     lcd = LCD()
-    P.image.save(lcd.render(123456789, 10, backgroundcolor = P.Color(0,0,0)), "lcd.png")
+    P.image.save(lcd.render(123456789, 15, backgroundcolor = P.Color(0,0,0)), "lcd.png")
