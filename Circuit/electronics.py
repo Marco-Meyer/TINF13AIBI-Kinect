@@ -1,3 +1,4 @@
+#! python3.4
 import pygame as P
 from random import randint
 
