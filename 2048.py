@@ -10,6 +10,7 @@ from os.path import join
 from sounds import Sounds
 import copy
 from Circuit import electronics
+from Circuit import lcd
 from score import Score
 from grid import Grid
 
@@ -68,6 +69,7 @@ print(EM)
 
 class Scorebar():
     def __init__(self):
+        self.ld = lcd.LCD()
         self.refresh()
     def refresh(self):
         U1.blit(bgU, (0,0))
@@ -77,8 +79,8 @@ class Scorebar():
         blit_centered(U1, self.labCur, (reswH/2, vextH/3+10))
         blit_centered(U2, self.labHig, (reswH/2, vextH/3+10))
 
-        advCur = scF.render("%s" % (score.current), True, (255, 255, 255))
-        advHig = scF.render("%s" % (score.highest), True, (255, 255, 255))
+        advCur = self.ld.render("%s" % (score.current), 4)
+        advHig = self.ld.render("%s" % (score.highest), 4)
         blit_centered(U1, advCur, (reswH/2, vextH/3*4-5))
         blit_centered(U2, advHig, (reswH/2, vextH/3*4-5))
 

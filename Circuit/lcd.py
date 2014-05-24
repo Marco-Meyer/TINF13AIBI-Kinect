@@ -13,7 +13,7 @@ class LCD():
               }
     def __init__(self, color : P.Color = (255,50,50), offcolor : P.Color = (50, 0, 0)):
         self.color = color
-        element = P.image.load("element.png")
+        element = P.image.load("Circuit/element.png")
         offelement = element.copy()
         self.size = element.get_size()
         blitter = P.Surface(self.size)
