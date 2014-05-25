@@ -116,7 +116,8 @@ centers = []
 for x in range(xdelta,resw,xdelta):
     for y in range(xdelta,resh,xdelta):
         centers.append((x,y))
-elegrid = electronics.Grid(resolution, chip, connectors, centers)
+tilemap = electronics.TileMap()
+elegrid = electronics.Grid(resolution, chip, connectors, centers, tilemap)
 
 #score
 score = Score()
