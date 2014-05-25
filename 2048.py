@@ -79,10 +79,10 @@ class Scorebar():
         blit_centered(U1, self.labCur, (reswH/2, vextH/3+10))
         blit_centered(U2, self.labHig, (reswH/2, vextH/3+10))
 
-        advCur = self.ld.render("%s" % (score.current), 4)
-        advHig = self.ld.render("%s" % (score.highest), 4)
-        blit_centered(U1, advCur, (reswH/2, vextH/3*4-5))
-        blit_centered(U2, advHig, (reswH/2, vextH/3*4-5))
+        advCur = self.ld.render("%s" % (score.current), 6)
+        advHig = self.ld.render("%s" % (score.highest), 6)
+        blit_centered(U1, advCur, (reswH/2, vextH/3*4-3))
+        blit_centered(U2, advHig, (reswH/2, vextH/3*4-3))
 
 def rot90(x,y, times):
     #not sure if it's working
