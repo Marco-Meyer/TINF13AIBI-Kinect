@@ -7,7 +7,7 @@ from random import randint
 if __name__ == "__main__":
     import sys
     sys.path.append("..")
-from Circuit import paths
+
 from Engine.effects import repeated_surface as repeat
 
 class Chip():

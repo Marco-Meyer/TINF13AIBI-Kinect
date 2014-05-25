@@ -27,7 +27,7 @@ class LCD():
                      (1,0) : element,
                      (0,1) : roffelement,
                      (1,1) : relement}
-        dif = 10
+        dif = self.size[0]
         w,h = self.size
         self.signsize = h+2*dif, 2*dif+2*h+w
         #ID : (X, Y, Rotation)
@@ -60,5 +60,7 @@ class LCD():
         return T
 
 if __name__ == "__main__":
+    import os
+    os.chdir("./../")
     lcd = LCD()
     P.image.save(lcd.render(123456789, 15, backgroundcolor = P.Color(0,0,0)), "lcd.png")
