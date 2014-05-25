@@ -70,19 +70,21 @@ print(EM)
 class Scorebar():
     def __init__(self):
         self.ld = lcd.LCD()
+        self.labCur = scF.render("Score", True, (61, 61, 61))
+        self.labHig = scF.render("Highscore", True, (61, 61, 61))
         self.refresh()
     def refresh(self):
         U1.blit(bgU, (0,0))
         U2.blit(bgU, (0,0))
-        self.labCur = scF.render("Score", True, (61, 61, 61))
-        self.labHig = scF.render("Highscore", True, (61, 61, 61))
-        blit_centered(U1, self.labCur, (reswH/2, vextH/3+10))
-        blit_centered(U2, self.labHig, (reswH/2, vextH/3+10))
+        target = (reswH/2, vextH/3+10)
+        blit_centered(U1, self.labCur, target)
+        blit_centered(U2, self.labHig, target)
 
         advCur = self.ld.render("%s" % (score.current), 6)
         advHig = self.ld.render("%s" % (score.highest), 6)
-        blit_centered(U1, advCur, (reswH/2, vextH/3*4-3))
-        blit_centered(U2, advHig, (reswH/2, vextH/3*4-3))
+        target = (reswH/2, vextH/3*4-3)
+        blit_centered(U1, advCur, target)
+        blit_centered(U2, advHig, target)
 
 def rot90(x,y, times):
     #not sure if it's working
