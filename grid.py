@@ -6,7 +6,6 @@ import sys
 sys.path.append("Engine")
 from sounds import Sounds 
 
-#sounds = Sounds()
 
 class Grid():
     def __init__(self, x,y):
@@ -14,11 +13,15 @@ class Grid():
         self.y = y
         self.posses = tuple(product(range(x), range(y)))
         self.area = numpy.zeros((x,y),numpy.int32)
+
         #new tiles
         self.fresh = set()
         self.fill_random()
         self.fill_random()
         self.last = numpy.copy(self.area)
+        
+
+
 
     def fill_random(self):
         """Fills in a random position with 2 or 4
@@ -80,9 +83,10 @@ class Grid():
         for y in range(self.y):
             if self.move_slice(self.area[:, y]):
                 moves = True
-                #sounds.timer_stop("Slide", 0.1)
-                sounds.play_sound("Slide")
+                sounds.play_sounds("Slide")
 
+
+                
         if direction:self.area = numpy.rot90(self.area, 4-direction)
         return moves
 
