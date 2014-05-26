@@ -9,7 +9,8 @@ import numpy
 from os.path import join
 from sounds import Sounds
 import copy
-
+from Circuit import electronics
+from Circuit import lcd
 from score import Score
 from grid import Grid
 
@@ -25,17 +26,19 @@ class Game():
 P.init()
 gameover = False
 W,H = FIELD = (4,4)
-GRID = 120#Size of grid squares
+GRID = 150#Size of grid squares
 resw, resh = resolution = W*GRID, H*GRID
 #Sizes of Scorebar
-vext = 72
+vext = 110
 vextH = vext/2
 reswH = resw/2
 shadowd = 4
 side = 100
 GRIDh = GRID//2#half the size of a grid
 GRIDv = GRIDh//2#quarter "
-S = P.display.set_mode((resw, resh+vext))
+pixels = (resw, resh+vext)
+S = P.display.set_mode(pixels)
+print("Resolution:",pixels)
 D = S.subsurface((0,vext, resw, resh))
 #Upper Surface ('Scorebar')
 U1 = S.subsurface((0, 0, reswH, vext))
@@ -52,7 +55,7 @@ sound_time = 0.1
 
 
 #Design
-bgU = P.image.load(join('Images', 'des1.jpg'))
+bgU = P.image.load(join('Images', 'monitor.png'))
 bgD = P.image.load(join('Images', 'background.png'))
 
 
@@ -66,19 +69,20 @@ print(EM)
 
 class Scorebar():
     def __init__(self):
+        self.ld = lcd.LCD()
         self.refresh()
     def refresh(self):
         U1.blit(bgU, (0,0))
         U2.blit(bgU, (0,0))
-        self.labCur = scF.render("Score:", True, (255, 255, 255))
-        self.labHig = scF.render("Highscore:", True, (255, 255, 255))
-        blit_centered(U1, self.labCur, (reswH/2, vextH/3))
-        blit_centered(U2, self.labHig, (reswH/2, vextH/3))
+        self.labCur = scF.render("Score", True, (61, 61, 61))
+        self.labHig = scF.render("Highscore", True, (61, 61, 61))
+        blit_centered(U1, self.labCur, (reswH/2, vextH/3+10))
+        blit_centered(U2, self.labHig, (reswH/2, vextH/3+10))
 
-        advCur = scF.render("%s" % (score.current), True, (255, 255, 255))
-        advHig = scF.render("%s" % (score.highest), True, (255, 255, 255))
-        blit_centered(U1, advCur, (reswH/2, vextH/3*4))
-        blit_centered(U2, advHig, (reswH/2, vextH/3*4))
+        advCur = self.ld.render("%s" % (score.current), 6)
+        advHig = self.ld.render("%s" % (score.highest), 6)
+        blit_centered(U1, advCur, (reswH/2, vextH/3*4-3))
+        blit_centered(U2, advHig, (reswH/2, vextH/3*4-3))
 
 def rot90(x,y, times):
     #not sure if it's working
@@ -104,6 +108,17 @@ def blit_centered(target, blitter, pos):
     
 #####INITBLOCK#####
 
+#electronics
+connectors = electronics.Connector(3,10,3)
+chip = electronics.Chip(98, connectors)
+xdelta = resw//5
+centers = []
+for x in range(xdelta,resw,xdelta):
+    for y in range(xdelta,resh,xdelta):
+        centers.append((x,y))
+tilemap = electronics.TileMap()
+elegrid = electronics.Grid(resolution, chip, connectors, centers, tilemap)
+
 #score
 score = Score()
 scbar = Scorebar()
@@ -126,9 +141,9 @@ marker = P.Color(200,100,100)
 gocolor = P.Color(255, 0, 0, 100)
 
 #surface
-text = { 2**x : F.render(str(2**x), 1, (0,0,0), base) for x in range(20)}
-freshs = { 2**x : F.render(str(2**x), 1, (127,127,127), base) for x in range(20)}
-deltas = { 2**x : F.render(str(2**x), 1, (0,0,150), base) for x in range(20)}
+text = { 2**x : F.render(str(2**x), 1, (0,0,0)) for x in range(20)}
+freshs = { 2**x : F.render(str(2**x), 1, (127,127,127)) for x in range(20)}
+deltas = { 2**x : F.render(str(2**x), 1, (0,0,150)) for x in range(20)}
 
 #Game Over-Surface
 GO = P.Surface((resw, resh), P.SRCALPHA)
@@ -187,17 +202,17 @@ if __name__ == "__main__":
 
         #####RENDERBLOCK#####
         #D.fill(background)
-        D.blit(bgD, (0,0))
+        D.blit(elegrid.surface, (0,0))
         EM.dispatch("game_frame_start", D)
         delta = grid.area != grid.last #elementwise check for matrix
-        for x,y in posses:
+        for (x,y), pos in zip(posses,centers):
             val = grid.area[x, y]
-            rectshadow = x*GRID+GRIDh-side/2+shadowd, y*GRID+GRIDh-side/2+shadowd, side, side
-            P.draw.rect(D, shadow, rectshadow, 0)
-            rect = x*GRID+GRIDh-side/2, y*GRID+GRIDh-side/2, side, side
-            P.draw.rect(D, base, rect, 0)
+            #rectshadow = x*GRID+GRIDh-side/2+shadowd, y*GRID+GRIDh-side/2+shadowd, side, side
+            #P.draw.rect(D, shadow, rectshadow, 0)
+            #rect = x*GRID+GRIDh-side/2, y*GRID+GRIDh-side/2, side, side
+            #P.draw.rect(D, base, rect, 0)
             if val:
-                pos = x*GRID+GRIDh,y*GRID+GRIDh
+                #pos = x*GRID+GRIDh,y*GRID+GRIDh
                 if (x,y) in grid.fresh:blit_centered(D, freshs[val],pos)
                 elif delta[x,y]:blit_centered(D, deltas[val],pos)
                 else:blit_centered(D, text[val],pos)
