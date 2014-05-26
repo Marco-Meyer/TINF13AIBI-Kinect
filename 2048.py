@@ -182,6 +182,7 @@ if __name__ == "__main__":
                     grid.last = numpy.copy(grid.area)
                     EM.dispatch("movement_start", grid, direction-1)
                     if grid.move(direction-1):
+                        sounds.play_sound("Slide")
                         grid.fill_random()
                         ###########Slide############
                         if grid.area.all() and not gameover:#grid full and not yet gameover

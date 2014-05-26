@@ -83,7 +83,7 @@ class Grid():
         for y in range(self.y):
             if self.move_slice(self.area[:, y]):
                 moves = True
-                sounds.play_sounds("Slide")
+                
 
 
                 
