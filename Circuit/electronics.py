@@ -1,7 +1,7 @@
 #! python3.4
 import pygame as P
 from random import randint
-
+vec2d = P.math.Vector2
 
 
 if __name__ == "__main__":
@@ -34,20 +34,55 @@ class Chip():
             
         con1,con2,con3,con4 = connector.surfaces
         posses = tuple(range(connector.indent+rest//2, connector.indent+innerlength-rest//2, ele))
-        y = length-connector.length
-        for x in posses:
-            mx = x
+        self.dis = length-connector.length
+        for z in posses:
             
-            self.surface.blit(con2,(mx,0))#top
-            self.surface.blit(con4,(mx,y))#bottom
+            self.surface.blit(con2,(z,0))#top
+            self.surface.blit(con4,(z,self.dis))#bottom
             
-            self.surface.blit(con3, (0, mx))#left
-            self.surface.blit(con1, (y, mx))#right
+            self.surface.blit(con3, (0, z))#left
+            self.surface.blit(con1, (self.dis, z))#right
             
         self.interfaces = posses#attachement nodes for circuit
+    def get_interfaces(self, x,y):
+        sides = {}
+        sides["left"] = [vec2d(x, y+z) for z in self.interfaces]
+        sides["right"] = [vec2d(self.dis+x, y+z) for z in self.interfaces]
+        sides["top"] = [vec2d(x+z, y) for z in self.interfaces]
+        sides["bottom"] = [vec2d(x+z, y+self.dis) for z in self.interfaces]
+        return sides
     
+class Fizzle():
+    """electric fizzle on the Grid"""
+    def __init__(self, surface, connection, speed = 1):
+        self.connection = connection
+        self.surface = surface
+        self.pos = connection.start
+        self.direction = self.end-self.start
+        self.time = connection.time
         
 class Grid():
+    
+    class Node():
+        def __init__(self, position):
+            self.position = position
+            self.connections = []
+        def __repr__(self):
+            return "Node(%s,%s)" % self.position
+
+            
+    class Connection():
+        def __init__(self, start, end, node):
+            self.start = start
+            self.end = end
+            self.direction = end-start
+            self.direction.scale_to_length(1)
+            self.node = node
+        def scale_time(self, speed):
+            self.time = self.direction.length/speed
+            
+
+            
     def __init__(self, size, chip, connector, positions, tilemap):
         self.size = size
         self.chip = chip
@@ -60,9 +95,13 @@ class Grid():
         rows = set()
         barrows = []
         barlines = []
+        self.nodes = {}
+        interfaces = {}
         for x,y in positions:
             x,y = pos = (x-xshift, y-xshift)
             self.chipposs.append(pos)
+            self.nodes[(x,y)] = self.Node((x,y))
+            interfaces[(x,y)] = chip.get_interfaces(x,y)
             if y not in levels:
                 levels.add(y)
                 barlines += (y+interface for interface in chip.interfaces)
@@ -76,7 +115,42 @@ class Grid():
         for x in barlines:
             self.surface.blit(bar, (x-1, 0))
         [self.surface.blit(chip.surface, pos) for pos in self.chipposs]
+
+        ##################Fizzle Logic######################
+        xs = list(rows)
+        xs.sort()
+        ys = list(levels)
+        ys.sort()
+        for x in rows:
+
+            cons = [False, False]
+            if xs[0] != x:#not left end
+                print(xs,x)
+                leftx = xs[xs.index(x)-1]
+                cons[0] = True
+            if xs[-1] != x:#not right end
+                rightx = xs[xs.index(x)+1]
+                cons[1] = True
+            for y in levels:
+
+                localnode = self.nodes[(x,y)]
+                if cons[0]:
+                    leftnode = self.nodes[(leftx, y)]
+                    for left, right in zip(interfaces[(leftx, y)]["right"],
+                                           interfaces[(x,y)]["left"]):
+                        leftnode.connections.append(self.Connection(left, right, localnode))
+                        localnode.connections.append(self.Connection(right, left, leftnode))
+                if cons[1]:
+                    rightnode = self.nodes[(rightx, y)]
+                    for right, left in zip(interfaces[(rightx, y)]["left"],
+                                           interfaces[(x,y)]["right"]):
+                        rightnode.connections.append(self.Connection(right, left, localnode))
+                        localnode.connections.append(self.Connection(left, right, rightnode))
+
         
+                        
+
+            
     
 class TileMap():
     def __init__(self, outercolor = (0,150,0), innercolor = (250,250,250)):
