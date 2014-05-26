@@ -184,7 +184,7 @@ class TileMap():
         
     def save_images(self):
         for name, surface in self.tiles.items():
-            P.image.save(surface, name+".png")
+            P.image.save(surface, "_test_"+name+".png")
     
 def create_conductor(length, width, light = (200,200,200), dark = (127,127,127)):
     l = length//3
@@ -217,7 +217,7 @@ if __name__ == "__main__":
     connectors = Connector(3,10,3)
     chip = Chip(78, connectors)
     #P.image.save(chip.surface, "test.png")
-    P.image.save(create_conductor(20,4), "conductor.png")
+    P.image.save(create_conductor(20,4), "_test_conductor.png")
     size = (480, 480)
     xdelta = size[0]//5
     positions = []
@@ -228,4 +228,4 @@ if __name__ == "__main__":
     tilemap = TileMap()
     tilemap.save_images()
     grid = Grid(size, chip, connectors, positions, tilemap)
-    P.image.save(grid.surface, "test.png")
+    P.image.save(grid.surface, "_test.png")
