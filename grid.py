@@ -1,14 +1,15 @@
 import numpy
 from itertools import product
 from random import randint
-import copy
 
 class Grid():
-    def __init__(self, x,y):
+    def __init__(self, x,y, clone = False):
+        if clone:self.area = numpy.copy(clone.area)
+        else:self.area = numpy.zeros((x,y),numpy.int32)
         self.x = x
         self.y = y
         self.posses = tuple(product(range(x), range(y)))
-        self.area = numpy.zeros((x,y),numpy.int32)
+        
         #new tiles
         self.fresh = set()
         self.fill_random()
@@ -59,7 +60,7 @@ class Grid():
             if slice[xi] == val and xi not in blocked:#not already merged and has to be equal
                 slice[xi] = val*2 
                 slice[x] = 0
-                self.addscore(val*2)
+                if self.real:self.addscore(val*2)#else not real
                 blocked.add(xi)#prevent multiple merges per movement
                 movement = True
                 break
@@ -76,9 +77,11 @@ class Grid():
             if self.move_slice(self.area[:, y]): moves = True            
         if direction:self.area = numpy.rot90(self.area, 4-direction)
         return moves
+    
+    real = property(lambda self:hasattr(self, "game"), doc = "Tells if real or clone")
 
     def check_merge(self):
-        grid_twit = copy.deepcopy(self)
+        grid_twit = Grid(self.x, self.y, clone = self)#was : copy.deepcopy(self)
         grid_twit.move(1)
         grid_twit.move(2)
         if numpy.array_equal(grid_twit.area, self.area): return False

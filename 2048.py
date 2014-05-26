@@ -8,11 +8,11 @@ from itertools import product
 import numpy
 from os.path import join
 from sounds import Sounds
-import copy
 from Circuit import electronics
 from Circuit import lcd
 from score import Score
 from grid import Grid
+import time
 
 class Game():
     def __init__(self, grid, score, scorebar):
@@ -156,37 +156,43 @@ blit_centered(GO, gof, (resw/2, resh/2))
 #misc
 clock = P.time.Clock()
 EM.dispatch("game_start", grid)
+can_move = True
+busy = idle = move_timeout = 0
+next_resource_print = time.time()+5
 
 if __name__ == "__main__":
     while 1:
-        
+        timer = time.time()
         #####EVENTBLOCK#####
         for e in P.event.get():
             if e.type == P.QUIT:
                 P.quit()
                 sys.exit()
-            elif e.type == P.KEYDOWN and not gameover:
-                direction = 0
-                if e.key == P.K_RIGHT:
-                    direction = 1
-                elif e.key == P.K_UP:
-                    direction = 2
-                elif e.key == P.K_LEFT:
-                    direction = 3
-                elif e.key == P.K_DOWN:
-                    direction = 4
-                if direction:
-                    grid.fresh = set()
-                    grid.last = numpy.copy(grid.area)
-                    EM.dispatch("movement_start", grid, direction-1)
-                    if grid.move(direction-1):
-                        grid.fill_random()
-                        if grid.area.all() and not gameover:#grid full and not yet gameover
-                            if not grid.check_merge():
-                                gameover = True
-            elif e.type == P.KEYDOWN and gameover:
-               new_Round()
-                    
+            elif e.type == P.KEYDOWN:
+                if gameover:
+                    if not move_timeout > timer:new_Round()
+
+                else:
+                    direction = 0
+                    if e.key == P.K_RIGHT:
+                        direction = 1
+                    elif e.key == P.K_UP:
+                        direction = 2
+                    elif e.key == P.K_LEFT:
+                        direction = 3
+                    elif e.key == P.K_DOWN:
+                        direction = 4
+                    if direction:
+                        grid.fresh = set()
+                        grid.last = numpy.copy(grid.area)
+                        EM.dispatch("movement_start", grid, direction-1)
+                        if grid.move(direction-1):
+                            grid.fill_random()
+                            if grid.area.all() and not gameover:#grid full and not yet gameover
+                                if not grid.check_merge():
+                                    gameover = True
+                                    move_timeout = time.time()+1#1 second gameover
+                                                            
         #####LOGICBLOCK#####
         EM.dispatch("game_logic_start", grid)
 
@@ -210,4 +216,13 @@ if __name__ == "__main__":
             D.blit(GO, (0,0))
         EM.dispatch("game_frame_end", D)
         P.display.flip()
+        idlestart = time.time()
         clock.tick(60)
+        #Resource evalution
+        post = time.time()
+        busy += idlestart-timer
+        idle += post-idlestart
+        if timer > next_resource_print:
+            next_resource_print = timer+5
+            print("Was idling {}% the last 5 seconds""".format(int((100*idle)/(idle+busy))))
+            busy = idle = 0
