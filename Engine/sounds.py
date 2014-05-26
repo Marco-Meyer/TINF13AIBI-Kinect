@@ -24,8 +24,8 @@ class Sounds():
         self.sounds[name].set_volume(value)
 
     def timer_stop(self, name, time = 0.1):
-       #print(self)
-        Timer(time, self.sound_stop, (self, name)
+        #print(self)
+        Timer(time, self.sound_stop, (self, name))
         
     def sound_stop(self, name):
         self.sounds[name].stop()
