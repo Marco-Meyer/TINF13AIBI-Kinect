@@ -1,6 +1,7 @@
 #! python3.4
 import pygame as P
-from random import randint
+from random import randint, choice
+from os.path import join
 vec2d = P.math.Vector2
 
 
@@ -44,6 +45,7 @@ class Chip():
             self.surface.blit(con1, (self.dis, z))#right
             
         self.interfaces = posses#attachement nodes for circuit
+        
     def get_interfaces(self, x,y):
         sides = {}
         sides["left"] = [vec2d(x, y+z) for z in self.interfaces]
@@ -51,37 +53,67 @@ class Chip():
         sides["top"] = [vec2d(x+z, y) for z in self.interfaces]
         sides["bottom"] = [vec2d(x+z, y+self.dis) for z in self.interfaces]
         return sides
+
+
+class AnimFizzle():
+    def __init__(self, grid,amount, speed, color = (250,250,100)):
+        
+        self.grid = grid
+        connections = []
+        for node in grid.nodes.values():
+            connections.extend(node.connections)
+        [c.direction.scale_to_length(speed) for c in connections]
+        [c.scale_time(speed) for c in connections]
+        fizimage = P.image.load(join("Circuit","blib.png"))
+        blitter = P.Surface(fizimage.get_size())
+        blitter.fill(color)
+        fizimage.blit(blitter, (0,0), special_flags = P.BLEND_MULT)
+        self.fizzles = [Fizzle(choice(connections),fizimage) for _ in range(amount)]
+        
+    def render(self,surface):
+        copy = self.grid.surface.copy()
+        rects = [f.render(copy) for f in self.fizzles]
+        surface.blit(copy, (0,0))
+        return rects
     
 class Fizzle():
     """electric fizzle on the Grid"""
-    def __init__(self, surface, connection, speed = 1):
-        self.connection = connection
+    def __init__(self, connection, surface):
+        self.follow(connection)
         self.surface = surface
-        self.pos = connection.start
-        self.direction = self.end-self.start
+        
+    def follow(self, connection):
+        self.connection = connection
+        self.direction = connection.direction
+        self.pos = vec2d(connection.start)
         self.time = connection.time
         
+    def render(self, target):
+        self.time -= 1
+        if self.time <= 0:
+            self.follow(choice(self.connection.node.connections))
+        self.pos += self.direction
+        target.blit(self.surface, self.pos)
+
+        
 class Grid():
-    
+    delta = vec2d(-1,-1)
     class Node():
         def __init__(self, position):
             self.position = position
             self.connections = []
         def __repr__(self):
             return "Node(%s,%s)" % self.position
-
             
     class Connection():
         def __init__(self, start, end, node):
-            self.start = start
-            self.end = end
+            self.start = start+Grid.delta
+            self.end = end+Grid.delta
             self.direction = end-start
-            self.direction.scale_to_length(1)
+            #self.direction.scale_to_length(1)
             self.node = node
         def scale_time(self, speed):
-            self.time = self.direction.length/speed
-            
-
+            self.time = (self.end-self.start).length()/self.direction.length()
             
     def __init__(self, size, chip, connector, positions, tilemap):
         self.size = size
@@ -138,16 +170,28 @@ class Grid():
                     leftnode = self.nodes[(leftx, y)]
                     for left, right in zip(interfaces[(leftx, y)]["right"],
                                            interfaces[(x,y)]["left"]):
-                        leftnode.connections.append(self.Connection(left, right, localnode))
+                        #leftnode.connections.append(self.Connection(left, right, localnode))
                         localnode.connections.append(self.Connection(right, left, leftnode))
                 if cons[1]:
                     rightnode = self.nodes[(rightx, y)]
                     for right, left in zip(interfaces[(rightx, y)]["left"],
                                            interfaces[(x,y)]["right"]):
-                        rightnode.connections.append(self.Connection(right, left, localnode))
+                        #rightnode.connections.append(self.Connection(right, left, localnode))
                         localnode.connections.append(self.Connection(left, right, rightnode))
+                if ys[-1] != y:
+                    downy = ys[ys.index(y)+1]
+                    downnode = self.nodes[(x, downy)]
+                    for down, up in zip(interfaces[(x,downy)]["top"],
+                                        interfaces[(x,y)]["bottom"]):
+                        #downnode.connections.append(self.Connection(down, up, localnode))
+                        localnode.connections.append(self.Connection(up,down, downnode))
+                if ys[0] != y:
+                    upy = ys[ys.index(y)-1]
+                    upnode = self.nodes[(x, upy)]
+                    for up, down in zip(interfaces[(x,upy)]["bottom"],
+                                        interfaces[(x,y)]["top"]):
 
-        
+                        localnode.connections.append(self.Connection(down,up, upnode))
                         
 
             
