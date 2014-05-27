@@ -138,15 +138,13 @@ sounds = Sounds()
 
 #colors
 background = P.Color("light grey")
-base = P.Color(250, 250, 250)
-shadow = P.Color(100, 100, 100)
 marker = P.Color(200,100,100)
 gocolor = P.Color(255, 0, 0, 100)
 
 #surface
-text = { 2**x : F.render(str(2**x), 1, (0,0,0)) for x in range(20)}
+text = { 2**x : F.render(str(2**x), 1, (250,250,250)) for x in range(20)}
 freshs = { 2**x : F.render(str(2**x), 1, (127,127,127)) for x in range(20)}
-deltas = { 2**x : F.render(str(2**x), 1, (0,0,150)) for x in range(20)}
+deltas = { 2**x : F.render(str(2**x), 1, (50,50,200)) for x in range(20)}
 
 #Game Over-Surface
 GO = P.Surface((resw, resh), P.SRCALPHA)
