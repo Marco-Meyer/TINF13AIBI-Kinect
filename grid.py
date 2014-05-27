@@ -2,7 +2,21 @@ import numpy
 from itertools import product
 from random import randint
 
+
+
 class Grid():
+
+    class StateChange():
+        def __init__(self, direction):
+            self.direction = direction
+            self.movements = []
+            
+        def compute(self):
+            self.moves = [(self.rot(x,y, self.direction),self.rot(xi,y, self.direction)) for y,x,xi in self.movements]
+        
+        def rot(self, x,y, times):
+            return self.rot(y,4-x-1,times-1) if times else (x,y)
+        
     def __init__(self, x,y, clone = False):
         if clone:self.area = numpy.copy(clone.area)
         else:self.area = numpy.zeros((x,y),numpy.int32)
@@ -15,6 +29,9 @@ class Grid():
         self.fill_random()
         self.fill_random()
         self.last = numpy.copy(self.area)
+        self.change = self.StateChange(0)
+        self.change.compute()
+        self.cur_y = -1
         
     def fill_random(self):
         """Fills in a random position with 2 or 4
@@ -48,6 +65,7 @@ class Grid():
                 if slice[x] and not slice[x+1]:
                     slice[x+1] = slice[x]
                     slice[x] = 0
+                    self.change.movements.append((self.cur_y, x, x+1))
                     movement = True
                     innermove = True
         return movement
@@ -60,6 +78,7 @@ class Grid():
             if slice[xi] == val and xi not in blocked:#not already merged and has to be equal
                 slice[xi] = val*2 
                 slice[x] = 0
+                self.change.movements.append((self.cur_y, x, xi))
                 if self.real:self.addscore(val*2)#else not real
                 blocked.add(xi)#prevent multiple merges per movement
                 movement = True
@@ -70,12 +89,15 @@ class Grid():
     
     def move(self, direction = 0):
         """Moves the entire Grid in direction"""
+        self.change = self.StateChange(direction)
         used = set()
         if direction:self.area = numpy.rot90(self.area, direction)
         moves = False
         for y in range(self.y):
+            self.cur_y = y
             if self.move_slice(self.area[:, y]): moves = True            
         if direction:self.area = numpy.rot90(self.area, 4-direction)
+        self.change.compute()
         return moves
     
     real = property(lambda self:hasattr(self, "game"), doc = "Tells if real or clone")

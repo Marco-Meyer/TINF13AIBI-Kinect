@@ -86,18 +86,11 @@ class Scorebar():
         blit_centered(U1, advCur, target)
         blit_centered(U2, advHig, target)
 
-def rot90(x,y, times):
-    #not sure if it's working
-    print(x,y, "rotation")
-    return rot90(H-y-1, x, times-1) if times else (x,y)
-
 def new_Round():
     global gameover
     gameover = False
     score.next_Round()
     grid.reset()
-
-assert(rot90(3,2,4) == (3,2))
 
 def pos_gen():
     yield from product(range(W), range(H))
@@ -114,12 +107,13 @@ def blit_centered(target, blitter, pos):
 connectors = electronics.Connector(3,10,3)
 chip = electronics.Chip(98, connectors)
 xdelta = resw//5
-centers = []
-for x in range(xdelta,resw,xdelta):
-    for y in range(xdelta,resh,xdelta):
-        centers.append((x,y))
+centers = {}
+for ix,x in enumerate(range(xdelta,resw,xdelta)):
+    for iy,y in enumerate(range(xdelta,resh,xdelta)):
+        centers[ix,iy] = (x,y)
+        
 tilemap = electronics.TileMap()
-elegrid = electronics.Grid(resolution, chip, connectors, centers, tilemap)
+elegrid = electronics.Grid(resolution, chip, connectors, centers.values(), tilemap)
 fizzles = electronics.AnimFizzle(elegrid, 50, 1)
 
 #score
@@ -158,6 +152,7 @@ EM.dispatch("game_start", grid)
 can_move = True
 busy = idle = move_timeout = 0
 next_resource_print = time.time()+5
+show_moves = False
 
 if __name__ == "__main__":
     while 1:
@@ -172,6 +167,9 @@ if __name__ == "__main__":
                     if not move_timeout > timer:new_Round()
 
                 else:
+                    if e.key == P.K_m:
+                        show_moves = not show_moves
+                        continue
                     direction = 0
                     if e.key == P.K_RIGHT:
                         direction = 1
@@ -196,29 +194,33 @@ if __name__ == "__main__":
         EM.dispatch("game_logic_start", grid)
 
         #####RENDERBLOCK#####
-        #D.fill(background)
-        #D.blit(elegrid.surface, (0,0))
         fizzles.render(D)
         EM.dispatch("game_frame_start", D)
         delta = grid.area != grid.last #elementwise check for matrix
-        for (x,y), pos in zip(posses,centers):
+        for x,y in posses:
+            pos = centers[(x,y)]
             val = grid.area[x, y]
-            #rectshadow = x*GRID+GRIDh-side/2+shadowd, y*GRID+GRIDh-side/2+shadowd, side, side
-            #P.draw.rect(D, shadow, rectshadow, 0)
-            #rect = x*GRID+GRIDh-side/2, y*GRID+GRIDh-side/2, side, side
-            #P.draw.rect(D, base, rect, 0)
             if val:
-                #pos = x*GRID+GRIDh,y*GRID+GRIDh
                 if (x,y) in grid.fresh:blit_centered(D, freshs[val],pos)
                 elif delta[x,y]:blit_centered(D, deltas[val],pos)
                 else:blit_centered(D, text[val],pos)
+
+        ###DEBUG VISUALISATION###
+        if show_moves:
+            for start,end in grid.change.moves:
+                start = centers[start]; end = centers[end]
+                P.draw.circle(D, (255,255,255), start, 30,1)
+                P.draw.line(D, (255,255,255), start, end)
+                P.draw.circle(D, (50,250,250), end, 10,1)
+            
         if gameover:
             D.blit(GO, (0,0))
+            
         EM.dispatch("game_frame_end", D)
         P.display.flip()
         idlestart = time.time()
         clock.tick(60)
-        #Resource evalution
+        #Resource evaluation
         post = time.time()
         busy += idlestart-timer
         idle += post-idlestart

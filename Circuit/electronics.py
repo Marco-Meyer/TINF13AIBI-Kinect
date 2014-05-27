@@ -204,20 +204,15 @@ class Grid():
                         localnode.connections.append(self.Connection(down,up, upnode))
                          
 class TileMap():
-    def __init__(self, outercolor = (0,150,0), innercolor = (250,250,250)):
+    def __init__(self, outercolor = (10,10,150), innercolor = (250,250,250)):
         
-        middlecolor = P.Color(*[(x+y)//2 for x,y in zip(innercolor, outercolor)])
-        outercolor = P.Color(*outercolor)
-        innercolor = P.Color(*innercolor)
+        m = P.Color(*[(x+y)//2 for x,y in zip(innercolor, outercolor)])
+        o = P.Color(*outercolor)
+        i = P.Color(*innercolor)
         self.basecolor = outercolor
         size = 5,5
         l = 5
         self.tiles = {}
-        #shortcuts
-        m = middlecolor
-        o = outercolor
-        i = innercolor
-
 
         S = P.Surface(size)
         PA = P.PixelArray(S)
