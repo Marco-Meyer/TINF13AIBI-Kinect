@@ -120,6 +120,7 @@ for x in range(xdelta,resw,xdelta):
         centers.append((x,y))
 tilemap = electronics.TileMap()
 elegrid = electronics.Grid(resolution, chip, connectors, centers, tilemap)
+fizzles = electronics.AnimFizzle(elegrid, 50, 1)
 
 #score
 score = Score()
@@ -198,7 +199,8 @@ if __name__ == "__main__":
 
         #####RENDERBLOCK#####
         #D.fill(background)
-        D.blit(elegrid.surface, (0,0))
+        #D.blit(elegrid.surface, (0,0))
+        fizzles.render(D)
         EM.dispatch("game_frame_start", D)
         delta = grid.area != grid.last #elementwise check for matrix
         for (x,y), pos in zip(posses,centers):
