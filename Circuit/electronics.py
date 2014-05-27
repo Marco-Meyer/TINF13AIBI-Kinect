@@ -36,20 +36,6 @@ class Chip():
         con1,con2,con3,con4 = connector.surfaces
         posses = tuple(range(connector.indent+rest//2, connector.indent+innerlength-rest//2, ele))
 
-        y = length-connector.length
-        for x in posses:
-            mx = x
-            
-            self.surface.blit(con2,(mx,0))#top
-            self.surface.blit(con4,(mx,y))#bottom
-            
-            self.surface.blit(con3, (0, mx))#left
-            self.surface.blit(con1, (y, mx))#right
-            
-        self.interfaces = posses#attachement nodes for circuit
-    
-        
-class Grid():
         self.dis = length-connector.length
         for z in posses:
             
@@ -67,7 +53,7 @@ class Grid():
         sides["top"] = [vec2d(x+z, y) for z in self.interfaces]
         sides["bottom"] = [vec2d(x+z, y+self.dis) for z in self.interfaces]
         return sides
-    
+        
 class Fizzle():
     """electric fizzle on the Grid"""
     def __init__(self, surface, connection, speed = 1):
