@@ -24,13 +24,13 @@ class Sounds():
         self.sounds[name].set_volume(value)
 
     def timer_stop(self, name, time = 0.1):
-        #print(self)
+        print(self)
         Timer(time, self.sound_stop, (self, name))
         
     def sound_stop(self, name):
         self.sounds[name].stop()
         print("stoped " +name)
-##    
+    
 ##if __name__ == "__main__":
 ##    P.init()
 ##    P.display.set_mode([10,10])
@@ -39,3 +39,7 @@ class Sounds():
 ##    print(os.getcwd())
 ##    sounds = Sounds()
 ##    print(sounds.filenames)
+##    sounds.play_sound("Slide")
+##    sounds.timer_stop("Slide", 0.1)
+##    sounds.sound_stop("Slide")
+##

@@ -182,6 +182,7 @@ if __name__ == "__main__":
                     grid.last = numpy.copy(grid.area)
                     EM.dispatch("movement_start", grid, direction-1)
                     if grid.move(direction-1):
+                        sounds.timer_stop("Slide", 0.1)
                         sounds.play_sound("Slide")
                         grid.fill_random()
                         ###########Slide############
