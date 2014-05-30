@@ -1,4 +1,6 @@
-#! python3.4
+#! python2.7
+#Use Python 3 features from the future:
+from __future__ import division, print_function
 import pygame as P
 from random import *
 from array import array
@@ -30,8 +32,8 @@ GRID = 150#Size of grid squares
 resw, resh = resolution = W*GRID, H*GRID
 #Sizes of Scorebar
 vext = 110
-vextH = vext/2
-reswH = resw/2
+vextH = 110//2
+reswH = resw//2
 shadowd = 4
 side = 100
 GRIDh = GRID//2#half the size of a grid
@@ -48,7 +50,13 @@ P.display.set_caption("2048 Kinergie")
 from events import Manager
 F = P.font.Font(None, 70)#System default font @ 70 size
 scF = P.font.Font(None, 36)#Font of Scorebar @ 36 size
+loadtext = F.render("Loading", 1, (255,255,255),(0,0,0))
 
+r = S.blit(loadtext, (reswH-loadtext.get_width()//2,
+                      pixels[1]//2-loadtext.get_height()//2))
+
+P.display.update(r)
+del(r,loadtext)
 #Sound
 volume = 0.5 #between 0.0 - 1.0
 sound_time = 0.1
@@ -93,7 +101,7 @@ def new_Round():
     grid.reset()
 
 def pos_gen():
-    yield from product(range(W), range(H))
+    return tuple(product(range(W), range(H)))
 
 def blit_centered(target, blitter, pos):
     """Blits blitter centered on pos onto target"""
@@ -115,13 +123,13 @@ for ix,x in enumerate(range(xdelta,resw,xdelta)):
 tilemap = electronics.TileMap()
 elegrid = electronics.Grid(resolution, chip, connectors, centers.values(), tilemap)
 fizzles = electronics.AnimFizzle(elegrid, 50, 1)
-
+P.image.save(chip.surface, "test.png")
 #score
 score = Score()
 scbar = Scorebar()
 
 #grid
-posses = tuple(pos_gen())#all (x,y) pairs of the grid
+posses = pos_gen()#all (x,y) pairs of the grid
 grid = Grid(W,H)
 
 #game

@@ -1,17 +1,19 @@
 #! python3.4
+from __future__ import division, print_function
 import pygame as P
 
 from random import randint, choice
 from os.path import join
 from functools import reduce
 
-vec2d = P.math.Vector2
+
 
 
 if __name__ == "__main__":
     import sys
     sys.path.append("..")
 
+from vec2d import vec2d
 from Engine.effects import repeated_surface as repeat
 
 class Chip():
@@ -26,7 +28,7 @@ class Chip():
         insurface = self.surface.subsurface(innerrect)#P.Surface(self.innerrect.size)
         for x in range(insurface.get_width()):
             for y in range(insurface.get_height()):
-                insurface.set_at((x,y),[x+randint(-deviation, deviation) for x in innercolor[:3]])
+                insurface.set_at((x,y),[z+randint(-deviation, deviation) for z in innercolor[:3]])
         innerlength = innerrect.width
         ele = (connector.spacing+connector.width)
         
@@ -75,8 +77,9 @@ class AnimFizzle():
         connections = []
         for node in grid.nodes.values():
             connections.extend(node.connections)
-        [c.direction.scale_to_length(speed) for c in connections]
-        [c.scale_time(speed) for c in connections]
+        for c in connections:
+            c.direction.length = speed
+            c.scale_time(speed)            
         fizimage = P.image.load(join("Circuit","blib.png"))
         blitter = P.Surface(fizimage.get_size())
         blitter.fill(color)
@@ -88,12 +91,16 @@ class AnimFizzle():
         rects = [f.render(copy) for f in self.fizzles]
         surface.blit(copy, (0,0))
         return rects
-    
+
+Fi = 0
 class Fizzle():
     """electric fizzle on the Grid"""
     def __init__(self, connection, surface):
+        global Fi
         self.follow(connection)
         self.surface = surface
+        self.fi = Fi
+        Fi += 1
         
     def follow(self, connection):
         self.connection = connection
@@ -126,7 +133,7 @@ class Grid():
             self.direction = end-start
             self.node = node
         def scale_time(self, speed):
-            self.time = (self.end-self.start).length()/self.direction.length()
+            self.time = (self.end-self.start).length/self.direction.length
             
     def __init__(self, size, chip, connector, positions, tilemap):
         self.size = size
@@ -145,6 +152,8 @@ class Grid():
         barlines = []
         self.nodes = {}
         interfaces = {}
+
+        outsidenode = self.Node((None,None))
         
         for x,y in positions:
             x,y = pos = (x-xshift, y-xshift)
@@ -171,7 +180,7 @@ class Grid():
             else:spec = 0
             
             for yl in ys:
-                yt = yl+y+spec#yl+X+y-minstraight if y < size[1]//2 else y+yl-X+minstraight
+                yt = yl+y+spec
                 tilemap.draw_line(self.surface, (X-minstraight,yl+y+1), (0,yt+1))
                 tilemap.draw_line(self.surface, (XR+minstraight,yl+y+1), (size[0],yt+1))
 
@@ -184,6 +193,7 @@ class Grid():
             for xl in ys:
                 xt = xl+x+spec
                 tilemap.draw_line(self.surface, (x+xl+1, Y-minstraight),(xt+1, 0))
+
         ######Straight Connections######
         xs = min(rows)
         xe = max(rows)+chiplength
