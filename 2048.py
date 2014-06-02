@@ -168,7 +168,7 @@ def load_music (self, file, path ="Sounds", ending = ".mp3"):
 if __name__ == "__main__":
 
     ####Background Sound####   
-    P.mixer.music.play("Background.mp3")
+    #P.mixer.music.play("Background.mp3")
     
     while 1:
         timer = time.time()
@@ -204,10 +204,9 @@ if __name__ == "__main__":
                                 sounds.timer_stop("Lose", 0.1)
                                 sounds.play_sound("Lose")
                                 gameover = True
-               elif e.type == P.KEYDOWN:
-                if gameover:
-                    if not move_timeout > timer:new_Round()
-
+                elif e.type == P.KEYDOWN:
+                    if gameover:
+                        if not move_timeout > timer:new_Round()
                 else:
                     direction = 0
                     if e.key == P.K_RIGHT:
