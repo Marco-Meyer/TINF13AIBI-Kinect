@@ -84,7 +84,6 @@ class Scorebar():
     def refresh(self):
         U1.blit(bgU, (0,0))
         U2.blit(bgU, (0,0))
-
         target = (reswH/2, vextH/3+10)
         blit_centered(U1, self.labCur, target)
         blit_centered(U2, self.labHig, target)
@@ -116,7 +115,6 @@ def blit_centered(target, blitter, pos):
 connectors = electronics.Connector(3,10,3)
 chip = electronics.Chip(98, connectors)
 xdelta = resw//5
-
 centers = {}
 for ix,x in enumerate(range(xdelta,resw,xdelta)):
     for iy,y in enumerate(range(xdelta,resh,xdelta)):
@@ -125,7 +123,6 @@ for ix,x in enumerate(range(xdelta,resw,xdelta)):
 tilemap = electronics.TileMap()
 elegrid = electronics.Grid(resolution, chip, connectors, centers.values(), tilemap)
 fizzles = electronics.AnimFizzle(elegrid, 50, 1)
-P.image.save(chip.surface, "test.png")
 
 #score
 score = Score()

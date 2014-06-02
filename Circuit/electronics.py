@@ -172,7 +172,7 @@ class Grid():
         #####Diagonals#####
         X = min(rows)
         XR = max(rows)+chiplength
-        for y in levels:
+        for y in levels:#left and right endconnectors
             ys = chip.interfaces
             
             if y == min(levels):spec = X-minstraight
@@ -186,9 +186,12 @@ class Grid():
 
         Y = min(levels)
         for x in rows:
-            if x == min(rows):spec = Y-minstraight
-            elif x == max(rows):spec = -Y+minstraight
-            else:spec = 0
+            if x == min(rows):spec = 0#spec = Y-minstraight
+            elif x == max(rows):spec = 0#spec = -Y+minstraight
+            else:
+                if x > size[0]//2:spec = Y-minstraight
+                else:spec = -Y+minstraight
+                    
 
             for xl in ys:
                 xt = xl+x+spec
