@@ -1,4 +1,6 @@
-#! python3.4
+#! python2.7
+#Use Python 3 features from the future:
+from __future__ import division, print_function
 import pygame as P
 from random import *
 from array import array
@@ -30,8 +32,8 @@ GRID = 150#Size of grid squares
 resw, resh = resolution = W*GRID, H*GRID
 #Sizes of Scorebar
 vext = 110
-vextH = vext/2
-reswH = resw/2
+vextH = 110//2
+reswH = resw//2
 shadowd = 4
 side = 100
 GRIDh = GRID//2#half the size of a grid
@@ -48,7 +50,13 @@ P.display.set_caption("2048 Kinergie")
 from events import Manager
 F = P.font.Font(None, 70)#System default font @ 70 size
 scF = P.font.Font(None, 36)#Font of Scorebar @ 36 size
+loadtext = F.render("Loading", 1, (255,255,255),(0,0,0))
 
+r = S.blit(loadtext, (reswH-loadtext.get_width()//2,
+                      pixels[1]//2-loadtext.get_height()//2))
+
+P.display.update(r)
+del(r,loadtext)
 #Sound
 volume = 0.5 #between 0.0 - 1.0
 sound_time = 0.1
@@ -86,21 +94,14 @@ class Scorebar():
         blit_centered(U1, advCur, target)
         blit_centered(U2, advHig, target)
 
-def rot90(x,y, times):
-    #not sure if it's working
-    print(x,y, "rotation")
-    return rot90(H-y-1, x, times-1) if times else (x,y)
-
 def new_Round():
     global gameover
     gameover = False
     score.next_Round()
     grid.reset()
 
-assert(rot90(3,2,4) == (3,2))
-
 def pos_gen():
-    yield from product(range(W), range(H))
+    return tuple(product(range(W), range(H)))
 
 def blit_centered(target, blitter, pos):
     """Blits blitter centered on pos onto target"""
@@ -114,12 +115,13 @@ def blit_centered(target, blitter, pos):
 connectors = electronics.Connector(3,10,3)
 chip = electronics.Chip(98, connectors)
 xdelta = resw//5
-centers = []
-for x in range(xdelta,resw,xdelta):
-    for y in range(xdelta,resh,xdelta):
-        centers.append((x,y))
+centers = {}
+for ix,x in enumerate(range(xdelta,resw,xdelta)):
+    for iy,y in enumerate(range(xdelta,resh,xdelta)):
+        centers[ix,iy] = (x,y)
+        
 tilemap = electronics.TileMap()
-elegrid = electronics.Grid(resolution, chip, connectors, centers, tilemap)
+elegrid = electronics.Grid(resolution, chip, connectors, centers.values(), tilemap)
 fizzles = electronics.AnimFizzle(elegrid, 50, 1)
 
 #score
@@ -127,7 +129,7 @@ score = Score()
 scbar = Scorebar()
 
 #grid
-posses = tuple(pos_gen())#all (x,y) pairs of the grid
+posses = pos_gen()#all (x,y) pairs of the grid
 grid = Grid(W,H)
 
 #game
@@ -138,15 +140,13 @@ sounds = Sounds()
 
 #colors
 background = P.Color("light grey")
-base = P.Color(250, 250, 250)
-shadow = P.Color(100, 100, 100)
 marker = P.Color(200,100,100)
 gocolor = P.Color(255, 0, 0, 100)
 
 #surface
-text = { 2**x : F.render(str(2**x), 1, (0,0,0)) for x in range(20)}
+text = { 2**x : F.render(str(2**x), 1, (250,250,250)) for x in range(20)}
 freshs = { 2**x : F.render(str(2**x), 1, (127,127,127)) for x in range(20)}
-deltas = { 2**x : F.render(str(2**x), 1, (0,0,150)) for x in range(20)}
+deltas = { 2**x : F.render(str(2**x), 1, (50,50,200)) for x in range(20)}
 
 #Game Over-Surface
 GO = P.Surface((resw, resh), P.SRCALPHA)
@@ -160,6 +160,7 @@ EM.dispatch("game_start", grid)
 can_move = True
 busy = idle = move_timeout = 0
 next_resource_print = time.time()+5
+show_moves = False
 
 if __name__ == "__main__":
     while 1:
@@ -174,6 +175,9 @@ if __name__ == "__main__":
                     if not move_timeout > timer:new_Round()
 
                 else:
+                    if e.key == P.K_m:
+                        show_moves = not show_moves
+                        continue
                     direction = 0
                     if e.key == P.K_RIGHT:
                         direction = 1
@@ -198,29 +202,33 @@ if __name__ == "__main__":
         EM.dispatch("game_logic_start", grid)
 
         #####RENDERBLOCK#####
-        #D.fill(background)
-        #D.blit(elegrid.surface, (0,0))
         fizzles.render(D)
         EM.dispatch("game_frame_start", D)
         delta = grid.area != grid.last #elementwise check for matrix
-        for (x,y), pos in zip(posses,centers):
+        for x,y in posses:
+            pos = centers[(x,y)]
             val = grid.area[x, y]
-            #rectshadow = x*GRID+GRIDh-side/2+shadowd, y*GRID+GRIDh-side/2+shadowd, side, side
-            #P.draw.rect(D, shadow, rectshadow, 0)
-            #rect = x*GRID+GRIDh-side/2, y*GRID+GRIDh-side/2, side, side
-            #P.draw.rect(D, base, rect, 0)
             if val:
-                #pos = x*GRID+GRIDh,y*GRID+GRIDh
                 if (x,y) in grid.fresh:blit_centered(D, freshs[val],pos)
                 elif delta[x,y]:blit_centered(D, deltas[val],pos)
                 else:blit_centered(D, text[val],pos)
+
+        ###DEBUG VISUALISATION###
+        if show_moves:
+            for start,end in grid.change.moves:
+                start = centers[start]; end = centers[end]
+                P.draw.circle(D, (255,255,255), start, 30,1)
+                P.draw.line(D, (255,255,255), start, end)
+                P.draw.circle(D, (50,250,250), end, 10,1)
+            
         if gameover:
             D.blit(GO, (0,0))
+            
         EM.dispatch("game_frame_end", D)
         P.display.flip()
         idlestart = time.time()
         clock.tick(60)
-        #Resource evalution
+        #Resource evaluation
         post = time.time()
         busy += idlestart-timer
         idle += post-idlestart
