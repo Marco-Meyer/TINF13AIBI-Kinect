@@ -44,13 +44,15 @@ side = 100
 GRIDh = GRID//2#half the size of a grid
 GRIDv = GRIDh//2#quarter "
 pixels = (resw, resh+vext)
+P.display.set_icon(P.image.load(join("Circuit", "icon.png")))
+P.display.set_caption("2048 Kinergie", "2048")
 S = P.display.set_mode(pixels)
 print("Resolution:",pixels)
 D = S.subsurface((0,vext, resw, resh))
 #Upper Surface ('Scorebar')
 U1 = S.subsurface((0, 0, reswH, vext))
 U2 = S.subsurface((reswH, 0, reswH, vext))
-P.display.set_caption("2048 Kinergie")
+
 if SOUNDS:
     from sounds import Sounds
 else:
