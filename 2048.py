@@ -123,7 +123,7 @@ for ix,x in enumerate(range(xdelta,resw,xdelta)):
 tilemap = electronics.TileMap()
 elegrid = electronics.Grid(resolution, chip, connectors, centers.values(), tilemap)
 fizzles = electronics.AnimFizzle(elegrid, 50, 1)
-P.image.save(chip.surface, "test.png")
+
 #score
 score = Score()
 scbar = Scorebar()
