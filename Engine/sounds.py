@@ -31,15 +31,15 @@ class Sounds():
         self.sounds[name].stop()
         print("stoped " +name)
     
-if __name__ == "__main__":
-    P.init()
-    P.display.set_mode([10,10])
-    import sys
-    os.chdir("./../")
-    print(os.getcwd())
-    sounds = Sounds()
-    print(sounds.filenames)
-    sounds.play_sound("Slide")
-    #sounds.timer_stop("Slide", 0.1)
-    sounds.sound_stop("Slide")
+##if __name__ == "__main__":
+##    P.init()
+##    P.display.set_mode([10,10])
+##    import sys
+##    os.chdir("./../")
+##    print(os.getcwd())
+##    sounds = Sounds()
+##    print(sounds.filenames)
+##    sounds.play_sound("Slide")
+##    sounds.timer_stop("Slide", 0.1)
+##    sounds.sound_stop("Slide")
 
