@@ -8,11 +8,11 @@ from itertools import product
 import numpy
 from os.path import join
 from sounds import Sounds
-import copy
 from Circuit import electronics
 from Circuit import lcd
 from score import Score
 from grid import Grid
+import time
 
 class Game():
     def __init__(self, grid, score, scorebar):
@@ -53,11 +53,9 @@ scF = P.font.Font(None, 36)#Font of Scorebar @ 36 size
 volume = 0.5 #between 0.0 - 1.0
 sound_time = 0.1
 
-
 #Design
 bgU = P.image.load(join('Images', 'monitor.png'))
 bgD = P.image.load(join('Images', 'background.png'))
-
 
 ####GAMEEVENTS####
 EM = Manager()
@@ -70,19 +68,22 @@ print(EM)
 class Scorebar():
     def __init__(self):
         self.ld = lcd.LCD()
+        self.labCur = scF.render("Score", True, (61, 61, 61))
+        self.labHig = scF.render("Highscore", True, (61, 61, 61))
         self.refresh()
     def refresh(self):
         U1.blit(bgU, (0,0))
         U2.blit(bgU, (0,0))
-        self.labCur = scF.render("Score", True, (61, 61, 61))
-        self.labHig = scF.render("Highscore", True, (61, 61, 61))
-        blit_centered(U1, self.labCur, (reswH/2, vextH/3+10))
-        blit_centered(U2, self.labHig, (reswH/2, vextH/3+10))
+        target = (reswH/2, vextH/3+10)
+        blit_centered(U1, self.labCur, target)
+        blit_centered(U2, self.labHig, target)
 
         advCur = self.ld.render("%s" % (score.current), 6)
         advHig = self.ld.render("%s" % (score.highest), 6)
-        blit_centered(U1, advCur, (reswH/2, vextH/3*4-3))
-        blit_centered(U2, advHig, (reswH/2, vextH/3*4-3))
+
+        target = (reswH/2, vextH/3*4-3)
+        blit_centered(U1, advCur, target)
+        blit_centered(U2, advHig, target)
 
 def rot90(x,y, times):
     #not sure if it's working
@@ -118,6 +119,7 @@ for x in range(xdelta,resw,xdelta):
         centers.append((x,y))
 tilemap = electronics.TileMap()
 elegrid = electronics.Grid(resolution, chip, connectors, centers, tilemap)
+fizzles = electronics.AnimFizzle(elegrid, 50, 1)
 
 #score
 score = Score()
@@ -154,19 +156,28 @@ blit_centered(GO, gof, (resw/2, resh/2))
 #misc
 clock = P.time.Clock()
 EM.dispatch("game_start", grid)
+can_move = True
+busy = idle = move_timeout = 0
+next_resource_print = time.time()+5
+
+def load_music (self, file, path ="Sounds", ending = ".mp3"):
+    self.music[file] = P.mixer.music.load(join(path, file+ending))
+
+
 
 if __name__ == "__main__":
 
-    ####Background Sound####
-    sounds.play_sound("Background")
-
+    ####Background Sound####   
+    P.mixer.music.play("Background.mp3")
+    
     while 1:
-        
+        timer = time.time()
         #####EVENTBLOCK#####
         for e in P.event.get():
             if e.type == P.QUIT:
                 P.quit()
                 sys.exit()
+
             elif e.type == P.KEYDOWN and not gameover:
                 direction = 0
                 if e.key == P.K_RIGHT:
@@ -182,6 +193,8 @@ if __name__ == "__main__":
                     grid.last = numpy.copy(grid.area)
                     EM.dispatch("movement_start", grid, direction-1)
                     if grid.move(direction-1):
+                        #sounds.timer_stop(("Slide", 0.1))
+                        sounds.play_sound("Slide")
                         grid.fill_random()
                         ###########Slide############
                         if grid.area.all() and not gameover:#grid full and not yet gameover
@@ -191,18 +204,41 @@ if __name__ == "__main__":
                                 sounds.timer_stop("Lose", 0.1)
                                 sounds.play_sound("Lose")
                                 gameover = True
+               elif e.type == P.KEYDOWN:
+                if gameover:
+                    if not move_timeout > timer:new_Round()
 
-                                gameover = True                              
+                else:
+                    direction = 0
+                    if e.key == P.K_RIGHT:
+                        direction = 1
+                    elif e.key == P.K_UP:
+                        direction = 2
+                    elif e.key == P.K_LEFT:
+                        direction = 3
+                    elif e.key == P.K_DOWN:
+                        direction = 4
+                    if direction:
+                        grid.fresh = set()
+                        grid.last = numpy.copy(grid.area)
+                        EM.dispatch("movement_start", grid, direction-1)
+                        if grid.move(direction-1):
+                            grid.fill_random()
+                            if grid.area.all() and not gameover:#grid full and not yet gameover
+                                if not grid.check_merge():
+                                    move_timeout = time.time()+1#1 second gameover
+                                                                    ####Lose Sound####
+                                    sounds.timer_stop("Lose", 0.1)
+                                    sounds.play_sound("Lose")
+                                    gameover = True                   
 
-            elif e.type == P.KEYDOWN and gameover:
-               new_Round()
-                    
         #####LOGICBLOCK#####
         EM.dispatch("game_logic_start", grid)
 
         #####RENDERBLOCK#####
         #D.fill(background)
-        D.blit(elegrid.surface, (0,0))
+        #D.blit(elegrid.surface, (0,0))
+        fizzles.render(D)
         EM.dispatch("game_frame_start", D)
         delta = grid.area != grid.last #elementwise check for matrix
         for (x,y), pos in zip(posses,centers):
@@ -220,4 +256,13 @@ if __name__ == "__main__":
             D.blit(GO, (0,0))
         EM.dispatch("game_frame_end", D)
         P.display.flip()
+        idlestart = time.time()
         clock.tick(60)
+        #Resource evalution
+        post = time.time()
+        busy += idlestart-timer
+        idle += post-idlestart
+        if timer > next_resource_print:
+            next_resource_print = timer+5
+            print("Was idling {}% the last 5 seconds""".format(int((100*idle)/(idle+busy))))
+            busy = idle = 0
