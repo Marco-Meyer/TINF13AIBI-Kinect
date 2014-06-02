@@ -30,7 +30,17 @@ class Sounds():
     def sound_stop(self, name):
         self.sounds[name].stop()
         print("stoped " +name)
-    
+
+class NoSounds():
+    def __init__(self, *args, **kwargs):
+        self.sounds = {}
+        for funcname in {"load_sound", "play_sound", "sound_volume",
+                         "timer_stop", "sound_stop"}:
+            setattr(self, funcname, self.do_nothing)
+            
+    def do_nothing(*args, **kwargs):pass
+
+
 ##if __name__ == "__main__":
 ##    P.init()
 ##    P.display.set_mode([10,10])
