@@ -256,9 +256,11 @@ class Grid():
 class TileMap():
     def __init__(self, outercolor = (10,10,150), innercolor = (250,250,250)):
         
+
         self.m = m = P.Color(*[(x+y)//2 for x,y in zip(innercolor, outercolor)])
         self.o = o = P.Color(*outercolor)
         self.i = i = P.Color(*innercolor)
+
         self.basecolor = outercolor
         size = 5,5
         l = 5

@@ -61,11 +61,9 @@ del(r,loadtext)
 volume = 0.5 #between 0.0 - 1.0
 sound_time = 0.1
 
-
 #Design
 bgU = P.image.load(join('Images', 'monitor.png'))
 bgD = P.image.load(join('Images', 'background.png'))
-
 
 ####GAMEEVENTS####
 EM = Manager()
@@ -90,6 +88,7 @@ class Scorebar():
 
         advCur = self.ld.render("%s" % (score.current), 6)
         advHig = self.ld.render("%s" % (score.highest), 6)
+
         target = (reswH/2, vextH/3*4-3)
         blit_centered(U1, advCur, target)
         blit_centered(U2, advHig, target)
@@ -162,7 +161,16 @@ busy = idle = move_timeout = 0
 next_resource_print = time.time()+5
 show_moves = False
 
+def load_music (self, file, path ="Sounds", ending = ".mp3"):
+    self.music[file] = P.mixer.music.load(join(path, file+ending))
+
+
+
 if __name__ == "__main__":
+
+    ####Background Sound####   
+    #P.mixer.music.play("Background.mp3")
+    
     while 1:
         timer = time.time()
         #####EVENTBLOCK#####
@@ -170,10 +178,36 @@ if __name__ == "__main__":
             if e.type == P.QUIT:
                 P.quit()
                 sys.exit()
-            elif e.type == P.KEYDOWN:
-                if gameover:
-                    if not move_timeout > timer:new_Round()
 
+            elif e.type == P.KEYDOWN and not gameover:
+                direction = 0
+                if e.key == P.K_RIGHT:
+                    direction = 1
+                elif e.key == P.K_UP:
+                    direction = 2
+                elif e.key == P.K_LEFT:
+                    direction = 3
+                elif e.key == P.K_DOWN:
+                    direction = 4
+                if direction:
+                    grid.fresh = set()
+                    grid.last = numpy.copy(grid.area)
+                    EM.dispatch("movement_start", grid, direction-1)
+                    if grid.move(direction-1):
+                        #sounds.timer_stop(("Slide", 0.1))
+                        sounds.play_sound("Slide")
+                        grid.fill_random()
+                        ###########Slide############
+                        if grid.area.all() and not gameover:#grid full and not yet gameover
+                            if not grid.check_merge():
+
+                                ####Lose Sound####
+                                sounds.timer_stop("Lose", 0.1)
+                                sounds.play_sound("Lose")
+                                gameover = True
+                elif e.type == P.KEYDOWN:
+                    if gameover:
+                        if not move_timeout > timer:new_Round()
                 else:
                     if e.key == P.K_m:
                         show_moves = not show_moves
@@ -195,9 +229,12 @@ if __name__ == "__main__":
                             grid.fill_random()
                             if grid.area.all() and not gameover:#grid full and not yet gameover
                                 if not grid.check_merge():
-                                    gameover = True
                                     move_timeout = time.time()+1#1 second gameover
-                                                            
+                                                                    ####Lose Sound####
+                                    sounds.timer_stop("Lose", 0.1)
+                                    sounds.play_sound("Lose")
+                                    gameover = True                   
+
         #####LOGICBLOCK#####
         EM.dispatch("game_logic_start", grid)
 
