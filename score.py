@@ -1,9 +1,15 @@
+import pickle
 
 class Score():
     def __init__(self):
-        
         self.current = 0
         self.highest = 0
+        try:
+            self.load_Score()
+        except FileNotFoundError:
+            print("No save.p found, so start Highscore = 0")
+        except AttributeError:
+            print("No 'first' in dict of save.p, so start Highscore = 0")
     def __iadd__(self, other):
         self.current += other
         self.highest = max(self.highest, self.current)
@@ -13,3 +19,10 @@ class Score():
     def next_Round(self):
         self.current = 0
         self.game.scbar.refresh()
+    def save_Score(self):
+        scorelist = { "first": self.highest }# I called this scorelist if we want to add something e.g. the ten best scores
+        pickle.dump(scorelist, open("save.p","wb"))
+    def load_Score(self):
+        scorelist = pickle.load(open("save.p","rb"))
+        #scorelist is now { "first": self.highest }
+        self.highest = scorelist.first()

@@ -19,6 +19,7 @@ from Circuit import lcd
 from score import Score
 from grid import Grid
 import time
+import atexit
 
 class Game():
     def __init__(self, grid, score, scorebar):
@@ -178,6 +179,9 @@ can_move = True
 busy = idle = move_timeout = 0
 next_resource_print = time.time()+5
 show_moves = False
+
+#atexit-registrations
+atexit.register(score.save_Score())#does not work yet
 
 def load_music (self, file, path ="Sounds", ending = ".mp3"):
     self.music[file] = P.mixer.music.load(join(path, file+ending))
