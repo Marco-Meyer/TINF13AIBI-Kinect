@@ -5,7 +5,7 @@ class Score():
         self.current = 0
         self.highest = 0
         try:
-            self.load_Score()
+            self.load()
         except FileNotFoundError:
             print("No save.p found, so start Highscore = 0")
         except AttributeError:
@@ -19,10 +19,10 @@ class Score():
     def next_Round(self):
         self.current = 0
         self.game.scbar.refresh()
-    def save_Score(self):
+    def save(self):
         scorelist = { "first": self.highest }# I called this scorelist if we want to add something e.g. the ten best scores
         pickle.dump(scorelist, open("save.p","wb"))
-    def load_Score(self):
+    def load(self):
         scorelist = pickle.load(open("save.p","rb"))
         #scorelist is now { "first": self.highest }
-        self.highest = scorelist.first()
+        self.highest = scorelist["first"]
