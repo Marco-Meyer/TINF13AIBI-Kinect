@@ -182,7 +182,7 @@ next_resource_print = time.time()+5
 show_moves = False
 
 #atexit-registrations
-atexit.register(score.save_Score())#does not work yet
+atexit.register(score.save)
 
 def load_music (self, file, path ="Sounds", ending = ".mp3"):
     self.music[file] = P.mixer.music.load(join(path, file+ending))
@@ -236,6 +236,7 @@ if __name__ == "__main__":
                                     
             elif e.type == P.KEYDOWN and gameover:
                 if move_timeout <= timer and e.key == P.K_RIGHT:
+                    score.save()
                     new_Round()
 
         
