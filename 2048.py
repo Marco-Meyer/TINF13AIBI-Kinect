@@ -53,8 +53,11 @@ scF = P.font.Font(None, 36)#Font of Scorebar @ 36 size
 volume = 0.5 #between 0.0 - 1.0
 sound_time = 0.1
 
+
 #Design
 bgU = P.image.load(join('Images', 'monitor.png'))
+bgD = P.image.load(join('Images', 'background.png'))
+
 
 ####GAMEEVENTS####
 EM = Manager()
