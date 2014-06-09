@@ -11,7 +11,7 @@ class LCD():
               "8" : {0,1,2,3,4,5,6},
               "9" : {0,1,3,4,5,6},
               }
-    def __init__(self, color : P.Color = (255,50,50), offcolor : P.Color = (50, 0, 0)):
+    def __init__(self, color = P.Color(255,50,50), offcolor = P.Color(50, 0, 0)):
         self.color = color
         element = P.image.load("Circuit/element.png")
         offelement = element.copy()

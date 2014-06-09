@@ -15,7 +15,8 @@ class Grid():
             self.moves = [(self.rot(x,y, self.direction),self.rot(xi,y, self.direction)) for y,x,xi in self.movements]
         
         def rot(self, x,y, times):
-            return self.rot(y,4-x-1,times-1) if times else (x,y)
+
+            return self.rot(y,3-x,times-1) if times else (x,y)
         
     def __init__(self, x,y, clone = False):
         if clone:self.area = numpy.copy(clone.area)
@@ -96,6 +97,7 @@ class Grid():
         for y in range(self.y):
             self.cur_y = y
             if self.move_slice(self.area[:, y]): moves = True            
+
         if direction:self.area = numpy.rot90(self.area, 4-direction)
         self.change.compute()
         return moves
