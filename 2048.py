@@ -73,7 +73,6 @@ sound_time = 0.1
 
 #Design
 bgU = P.image.load(join('Images', 'monitor.png'))
-bgD = P.image.load(join('Images', 'background.png'))
 
 ####GAMEEVENTS####
 EM = Manager()
