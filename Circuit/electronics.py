@@ -361,3 +361,6 @@ if __name__ == "__main__":
     P.image.save(testsurf, "_test_diagonal.png")
     grid = Grid(size, chip, connectors, positions, tilemap)
     P.image.save(grid.surface, "_test.png")
+    symcon = Connector(2, 7, 2, 2)
+    symbol = Chip(32, symcon)
+    P.image.save(symbol.surface, "icon.png")

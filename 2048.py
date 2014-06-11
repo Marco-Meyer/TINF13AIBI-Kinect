@@ -1,6 +1,10 @@
 #! python2.7
 #Use Python 3 features from the future:
 from __future__ import division, print_function
+
+#Build Configs
+SOUNDS = True
+
 import pygame as P
 from random import *
 from array import array
@@ -9,7 +13,7 @@ sys.path.append("Engine")
 from itertools import product
 import numpy
 from os.path import join
-from sounds import Sounds
+
 from Circuit import electronics
 from Circuit import lcd
 from score import Score
@@ -24,7 +28,8 @@ class Game():
         score.game = self
         self.scbar = scorebar
         scorebar.game = self
-        
+
+
 P.init()
 gameover = False
 W,H = FIELD = (4,4)
@@ -39,14 +44,19 @@ side = 100
 GRIDh = GRID//2#half the size of a grid
 GRIDv = GRIDh//2#quarter "
 pixels = (resw, resh+vext)
+P.display.set_icon(P.image.load(join("Circuit", "icon.png")))
+P.display.set_caption("2048 Kinergie", "2048")
 S = P.display.set_mode(pixels)
 print("Resolution:",pixels)
 D = S.subsurface((0,vext, resw, resh))
 #Upper Surface ('Scorebar')
 U1 = S.subsurface((0, 0, reswH, vext))
 U2 = S.subsurface((reswH, 0, reswH, vext))
-P.display.set_caption("2048 Kinergie")
 
+if SOUNDS:
+    from sounds import Sounds
+else:
+    from sounds import NoSounds as Sounds
 from events import Manager
 F = P.font.Font(None, 70)#System default font @ 70 size
 scF = P.font.Font(None, 36)#Font of Scorebar @ 36 size
@@ -63,7 +73,6 @@ sound_time = 0.1
 
 #Design
 bgU = P.image.load(join('Images', 'monitor.png'))
-bgD = P.image.load(join('Images', 'background.png'))
 
 ####GAMEEVENTS####
 EM = Manager()
