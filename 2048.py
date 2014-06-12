@@ -262,7 +262,7 @@ if __name__ == "__main__":
         D.fill((58,56,56),P.Rect(329,0,32,13))
         D.fill((58,56,56),P.Rect(539,0,32,13))
 
-        if gameover:
+        if gameover: 
             convertToGreyScale(D)
             D.blit(GO, (0,0))
 
