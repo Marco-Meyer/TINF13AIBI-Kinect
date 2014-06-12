@@ -18,6 +18,7 @@ from Circuit import electronics
 from Circuit import lcd
 from score import Score
 from grid import Grid
+import os
 import time
 
 class Game():
@@ -69,7 +70,8 @@ P.display.update(r)
 del(r,loadtext)
 #Sound
 volume = 0.5 #between 0.0 - 1.0
-sound_time = 0.1
+slidetime = 0.1
+losetime = 1
 
 #Design
 bgU = P.image.load(join('Images', 'monitor.png'))
@@ -201,18 +203,19 @@ if __name__ == "__main__":
                 if direction:
                     grid.fresh = set()
                     grid.last = numpy.copy(grid.area)
-                    EM.dispatch("movement_start", grid, direction-1)
+                    EM.dispatch("movement_start", grid, direction-1)                  
                     if grid.move(direction-1):
-                        #sounds.timer_stop(("Slide", 0.1))
-                        sounds.play_sound("Slide")
-                        grid.fill_random()
-                        ###########Slide############
+                        sounds.play_slide_sound()
+                        #sounds.play_sound("Slide")                        
+                        #sounds.sound_stop("Slide", slidetime)
+                        grid.fill_random()                        
                         if grid.area.all() and not gameover:#grid full and not yet gameover
                             if not grid.check_merge():
 
                                 ####Lose Sound####
-                                sounds.timer_stop("Lose", 0.1)
-                                sounds.play_sound("Lose")
+                                sounds.play_lose_sound()
+                               # sounds.play_sound("Lose")                                
+                               # sounds.sound_stop("Lose", losetime)
                                 gameover = True
                 elif e.type == P.KEYDOWN:
                     if gameover:
@@ -240,8 +243,7 @@ if __name__ == "__main__":
                                 if not grid.check_merge():
                                     move_timeout = time.time()+1#1 second gameover
                                                                     ####Lose Sound####
-                                    sounds.timer_stop("Lose", 0.1)
-                                    sounds.play_sound("Lose")
+                                    
                                     gameover = True                   
 
         #####LOGICBLOCK#####

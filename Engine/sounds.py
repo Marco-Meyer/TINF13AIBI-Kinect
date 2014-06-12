@@ -16,6 +16,15 @@ class Sounds():
     def load_sound(self, file, path ="Sounds", ending =".ogg"):
         self.sounds[file] = P.mixer.Sound(join(path, file+ending))
 
+    def play_slide_sound(self):
+        self.play_sound("Slide")
+        self.sound_stop("Slide", 0.1)
+
+    def play_lose_sound(self):
+        self.play_sound("Lose")
+        #self.sound_stop("Lose", 5)
+        
+        
     def play_sound(self, name):
         self.sounds[name].play()
         print("Play " +name)
@@ -27,7 +36,8 @@ class Sounds():
         print(self)
         Timer(time, self.sound_stop, (self, name))
         
-    def sound_stop(self, name):
+    def sound_stop(self, name, duration = 0):
+        time.sleep(duration)
         self.sounds[name].stop()
         print("stoped " +name)
 
@@ -50,6 +60,6 @@ class NoSounds():
 ##    sounds = Sounds()
 ##    print(sounds.filenames)
 ##    sounds.play_sound("Slide")
-##    sounds.timer_stop("Slide", 0.1)
-##    sounds.sound_stop("Slide")
+##   # sounds.timer_stop("Slide", 0.1)
+##   # sounds.sound_stop("Slide")
 
