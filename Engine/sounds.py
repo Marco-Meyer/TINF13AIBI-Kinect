@@ -12,21 +12,23 @@ class Sounds():
             base, ending = filename.split(".")
             print("Loaded "+base, ending)
             self.load_sound(base, ending = "." + ending)
+            P.mixer.set_num_channels(100)
             
     def load_sound(self, file, path ="Sounds", ending =".ogg"):
         self.sounds[file] = P.mixer.Sound(join(path, file+ending))
 
     def play_slide_sound(self):
-        self.play_sound("Slide")
-        self.sound_stop("Slide", 0.1)
+        self.play_sound("Slide", 100)
+        #self.sound_stop("Slide", 0.1)
 
     def play_lose_sound(self):
-        self.play_sound("Lose")
+        self.play_sound("Lose", 100)
         #self.sound_stop("Lose", 5)
         
         
-    def play_sound(self, name):
-        self.sounds[name].play()
+    def play_sound(self, name, duration):
+        self.sounds[name].play(1, duration)
+        print(self.sounds[name].play(1, duration))
         print("Play " +name)
         
     def sound_volume(self, name, value):
@@ -53,13 +55,13 @@ class NoSounds():
 
 ##if __name__ == "__main__":
 ##    P.init()
+##    i = 0
 ##    P.display.set_mode([10,10])
 ##    import sys
 ##    os.chdir("./../")
 ##    print(os.getcwd())
 ##    sounds = Sounds()
 ##    print(sounds.filenames)
-##    sounds.play_sound("Slide")
 ##   # sounds.timer_stop("Slide", 0.1)
 ##   # sounds.sound_stop("Slide")
-
+##

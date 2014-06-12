@@ -172,15 +172,15 @@ busy = idle = move_timeout = 0
 next_resource_print = time.time()+5
 show_moves = False
 
-def load_music (self, file, path ="Sounds", ending = ".mp3"):
-    self.music[file] = P.mixer.music.load(join(path, file+ending))
+##def load_music (self, file, path ="Sounds", ending = ".mp3"):
+##    self.music[file] = P.mixer.music.load(join(path, file+ending))
 
 
 
 if __name__ == "__main__":
 
     ####Background Sound####   
-    #P.mixer.music.play("Background.mp3")
+   ##### #P.mixer.music.play("Background.mp3")
     
     while 1:
         timer = time.time()
