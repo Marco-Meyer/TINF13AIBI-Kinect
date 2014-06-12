@@ -257,10 +257,13 @@ if __name__ == "__main__":
                 else:blit_centered(D, text[val],pos)
 
         #Transition
-        D.fill((58,56,56),P.Rect(29,0,32,13))
-        D.fill((58,56,56),P.Rect(239,0,32,13))
-        D.fill((58,56,56),P.Rect(329,0,32,13))
-        D.fill((58,56,56),P.Rect(539,0,32,13))
+        clip = P.image.load(join("Images", "clip.png"))
+        clip = P.transform.smoothscale(clip, (32, 13))
+        D.blit(clip, (29, 0))
+        D.blit(clip, (239, 0))
+        D.blit(clip, (329, 0))
+        D.blit(clip, (539, 0))
+
 
         if gameover: 
             convertToGreyScale(D)
