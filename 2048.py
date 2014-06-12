@@ -63,6 +63,7 @@ D = S.subsurface((0,vext, resw, resh))
 U1 = S.subsurface((0, 0, reswH, vext))
 U2 = S.subsurface((reswH, 0, reswH, vext))
 
+
 if SOUNDS:
     from sounds import Sounds
 else:
@@ -254,6 +255,12 @@ if __name__ == "__main__":
                 if (x,y) in grid.fresh:blit_centered(D, freshs[val],pos)
                 elif delta[x,y]:blit_centered(D, deltas[val],pos)
                 else:blit_centered(D, text[val],pos)
+
+        #Transition
+        D.fill((58,56,56),P.Rect(29,0,32,13))
+        D.fill((58,56,56),P.Rect(239,0,32,13))
+        D.fill((58,56,56),P.Rect(329,0,32,13))
+        D.fill((58,56,56),P.Rect(539,0,32,13))
 
         if gameover:
             convertToGreyScale(D)
