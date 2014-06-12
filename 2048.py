@@ -180,7 +180,7 @@ show_moves = False
 if __name__ == "__main__":
 
     ####Background Sound####   
-   ##### #P.mixer.music.play("Background.mp3")
+    sounds.play_backgroundmusic()  
     
     while 1:
         timer = time.time()
@@ -205,17 +205,13 @@ if __name__ == "__main__":
                     grid.last = numpy.copy(grid.area)
                     EM.dispatch("movement_start", grid, direction-1)                  
                     if grid.move(direction-1):
-                        sounds.play_slide_sound()
-                        #sounds.play_sound("Slide")                        
-                        #sounds.sound_stop("Slide", slidetime)
+                        #####Slide-Sound########
+                        sounds.play_slide_sound()                       
                         grid.fill_random()                        
                         if grid.area.all() and not gameover:#grid full and not yet gameover
                             if not grid.check_merge():
-
                                 ####Lose Sound####
-                                sounds.play_lose_sound()
-                               # sounds.play_sound("Lose")                                
-                               # sounds.sound_stop("Lose", losetime)
+                                sounds.play_lose_sound()                              
                                 gameover = True
                 elif e.type == P.KEYDOWN:
                     if gameover:
