@@ -181,8 +181,17 @@ busy = idle = move_timeout = 0
 next_resource_print = time.time()+5
 show_moves = False
 
-#atexit-registrations
-atexit.register(score.save)
+#autosave
+import threading
+main_thread = threading.current_thread()#unfortunately when debugging this returns the debugger
+def periodic_save():
+    while main_thread.is_alive():
+        time.sleep(7)
+        score.save()
+        print("Autosaved")
+        
+threading.Thread(target=periodic_save, name="AutoSaver").start()
+
 
 def load_music (self, file, path ="Sounds", ending = ".mp3"):
     self.music[file] = P.mixer.music.load(join(path, file+ending))
@@ -201,7 +210,6 @@ if __name__ == "__main__":
             if e.type == P.QUIT:
                 P.quit()
                 sys.exit()
-                
 
             elif e.type == P.KEYDOWN and not gameover:
                 direction = 0
