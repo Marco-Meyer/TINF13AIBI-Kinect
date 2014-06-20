@@ -5,32 +5,16 @@ import time
 import centroid_manager
 import delta_manager
 
-
-pygame.init()
-
 """
 Settings
 """
 delta           = 10            #Delta movement (in px)
 delta_interval  = 2.0           #Movement check interval (in s)
 kinect_interval = 0.2           #Kinect refresh interval (in s)
-kinect_crop     = 20            #cropped border size
-
-"""
-Kinect Methods
-"""
-def getDepthImage()
-    depth, timestamp = freenect.sync_get_depth()
-
-    np.clip(depth, 0, 2**10 - 1, depth)
-    depth >>= 2
-    depth = depth.astype(np.uint8)
-
-    return depth
-
+kinect_crop     = 20            #cropped border size (in px)
 
 def main(eventManager)
-    centroidManager = CentroidManager(kinect_crop)
+    centroidManager = MaskCentroidManager(kinect_crop)
     deltaManager = DeltaManager(delta)
     
     #sums the passed time to decide if centroids
@@ -45,7 +29,9 @@ def main(eventManager)
         
         if time_passed >= delta_interval:
             #push event
-            eventManager.push(deltaManager.get_Move_Events())
+            #eventManager.dispatch(*deltaManager.get_Move_Events())
+            dic = { 0 : pygame.K_RIGHT, 2 : pygame.K_LEFT, 1 : pygame.K_TOP, 3 : pygame.K_BOTTOM }
+            pygame.event.Event(pygame.KEYDOWN, dic[deltaManager.get_Move_Events()])
             time_passed = 0.0
 
         
