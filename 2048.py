@@ -38,11 +38,6 @@ def convertToGreyScale(surface):
             color = surface.get_at((x, y))
             greyscale = int(0.2989*color[0] + 0.5871 * color[1] + 0.114 * color[2])
             surface.set_at((x, y), (greyscale, greyscale, greyscale))
-            
-warningDisplayed = -1
-def setKinectWarning():
-    global warningDisplayed
-    warningDisplayed *= -1
     
 def copyGridRow():
     source = P.PixelArray(D)[:, 0]
@@ -52,6 +47,7 @@ def copyGridRow():
 
 P.init()
 gameover = False
+kinectWarningDisplayed = 0
 dirFlag = 0
 W,H = FIELD = (4,4)
 GRID = 150#Size of grid squares
@@ -227,7 +223,11 @@ if __name__ == "__main__":
             if e.type == P.QUIT:
                 P.quit()
                 sys.exit()
-
+            elif e.type == P.USEREVENT:
+                if e.action == None:
+                    kinectWarningDisplayed = 1
+                elif e.action == True:
+                    kinectWarningDisplayed = 0
             elif e.type == P.KEYDOWN and not gameover:
                 direction = 0
                 if e.key == P.K_RIGHT:
@@ -267,7 +267,6 @@ if __name__ == "__main__":
         EM.dispatch("game_logic_start", grid)
 
         #####RENDERBLOCK#####
-        copyGridRow()
         
         fizzles.render(D)
         EM.dispatch("game_frame_start", D)
@@ -288,7 +287,7 @@ if __name__ == "__main__":
         D.blit(clip, (329, 0))
         D.blit(clip, (539, 0))
 
-        if warningDisplayed > 0:
+        if kinectWarningDisplayed == 1:
             D.blit(scF.render("Bitte stellen Sie sich näher zur Kinect", True, (255, 255, 255)), (10, 25))
 
         #show movingdirection
@@ -305,6 +304,8 @@ if __name__ == "__main__":
             convertToGreyScale(D)
             dirFlag = 0
             D.blit(GO, (0,0))
+            
+        copyGridRow()
 
         ###DEBUG VISUALISATION###
         if show_moves:
