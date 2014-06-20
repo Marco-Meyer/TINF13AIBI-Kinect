@@ -10,6 +10,7 @@ from random import *
 from array import array
 import sys
 sys.path.append("Engine")
+kinect = "kinect" in sys.argv or "-kinect" in sys.argv
 from itertools import product
 import numpy
 from os.path import join
@@ -37,8 +38,6 @@ def convertToGreyScale(surface):
             color = surface.get_at((x, y))
             greyscale = int(0.2989*color[0] + 0.5871 * color[1] + 0.114 * color[2])
             surface.set_at((x, y), (greyscale, greyscale, greyscale))
-
-
 
 
 P.init()
