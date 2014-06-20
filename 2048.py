@@ -37,14 +37,18 @@ def convertToGreyScale(surface):
         for y in range(surface.get_size()[1]):
             color = surface.get_at((x, y))
             greyscale = int(0.2989*color[0] + 0.5871 * color[1] + 0.114 * color[2])
-            surface.set_at((x, y+100), (greyscale, greyscale, greyscale))
-
-def copyGridRow():
-    pixelarray = P.PixelArray(D)
-    for x in range(resw):
-        for y in range(10):
-            D.set_at((x, y), P.Color(pixelarray[x][y]))
             surface.set_at((x, y), (greyscale, greyscale, greyscale))
+            
+warningDisplayed = -1
+def setKinectWarning():
+    global warningDisplayed
+    warningDisplayed *= -1
+    
+def copyGridRow():
+    source = P.PixelArray(D)[:, 0]
+    target = P.PixelArray(S)
+    for y in range(10):
+        target[:, y+110] = source
 
 
 P.init()
@@ -54,22 +58,21 @@ GRID = 150#Size of grid squares
 resw, resh = resolution = W*GRID, H*GRID
 #Sizes of Scorebar
 vext = 110
-vextH = 110//2
+vextH = vext//2
 reswH = resw//2
 shadowd = 4
 side = 100
 GRIDh = GRID//2#half the size of a grid
 GRIDv = GRIDh//2#quarter "
-pixels = (resw, resh+vext)
+pixels = (resw, resh+vext+10)
 P.display.set_icon(P.image.load(join("Circuit", "icon.png")))
 P.display.set_caption("2048 Kinergie", "2048")
 S = P.display.set_mode(pixels)
 print("Resolution:",pixels)
-D = S.subsurface((0,vext, resw, resh))
+D = S.subsurface((0,vext+10, resw, resh))
 #Upper Surface ('Scorebar')
 U1 = S.subsurface((0, 0, reswH, vext))
 U2 = S.subsurface((reswH, 0, reswH, vext))
-
 
 if SOUNDS:
     from sounds import Sounds
@@ -159,7 +162,6 @@ scbar = Scorebar()
 posses = pos_gen()#all (x,y) pairs of the grid
 grid = Grid(W,H)
 
-
 #game
 game = Game(grid, score, scbar)
 
@@ -206,7 +208,6 @@ def load_music (self, file, path ="Sounds", ending = ".mp3"):
     self.music[file] = P.mixer.music.load(join(path, file+ending))
 
 
-
 if __name__ == "__main__":
 
     ####Background Sound####   
@@ -240,7 +241,7 @@ if __name__ == "__main__":
                         grid.fill_random()                        
                         if grid.area.all() and not gameover:#grid full and not yet gameover
                             if not grid.check_merge():
-                                move_timeout = timer + 3 #1 second gameover
+                                move_timeout = timer + 3 #3 seconds gameover
                                 ####Lose Sound####
                                 sounds.play_lose_sound()                              
                                 gameover = True
@@ -259,6 +260,7 @@ if __name__ == "__main__":
         EM.dispatch("game_logic_start", grid)
 
         #####RENDERBLOCK#####
+        copyGridRow()
         
         fizzles.render(D)
         EM.dispatch("game_frame_start", D)
@@ -271,7 +273,6 @@ if __name__ == "__main__":
                 elif delta[x,y]:blit_centered(D, deltas[val],pos)
                 else:blit_centered(D, text[val],pos)
         
-
         #Transition
         clip = P.image.load(join("Images", "clip.png"))
         clip = P.transform.smoothscale(clip, (32, 13))
@@ -280,19 +281,8 @@ if __name__ == "__main__":
         D.blit(clip, (329, 0))
         D.blit(clip, (539, 0))
 
-
-        if gameover: 
-            convertToGreyScale(D)
-            D.blit(GO, (0,0))
-
-        #Transition
-        clip = P.image.load(join("Images", "clip.png"))
-        clip = P.transform.smoothscale(clip, (32, 13))
-        D.blit(clip, (29, 0))
-        D.blit(clip, (239, 0))
-        D.blit(clip, (329, 0))
-        D.blit(clip, (539, 0))
-
+        if warningDisplayed > 0:
+            D.blit(scF.render("Bitte stellen Sie sich näher zur Kinect", True, (255, 255, 255)), (10, 25))
 
         if gameover: 
             convertToGreyScale(D)
