@@ -12,7 +12,7 @@ class Score():
             print("No 'first' in dict of save.p, so start Highscore = 0")
         except Exception as e:
             import warnings
-            warnings.warn(e)
+            warnings.warn(str(e))
     def __iadd__(self, other):
         self.current += other
         self.highest = max(self.highest, self.current)
