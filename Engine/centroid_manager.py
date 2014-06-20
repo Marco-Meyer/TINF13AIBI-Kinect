@@ -8,15 +8,18 @@ pygame.init()
 class MaskCentroidManager():
     """Consumes kinect images and provides centroids of mass"""
 
-    def __init__(self, crop):
+    def __init__(self, crop, base):
         self.croprect = pygame.Rect(480 - crop * 2, 640 - crop * 2, crop, crop)
         self.lastimage = pygame.Surface((1, 1))
+        self.base = base
 				
     def getCentroid(self, image):
-        mask = pygame.mask.from_threshold(self._get_surf(image), (120, 120, 120), (70, 70, 70, 255))
+        mask = pygame.mask.from_threshold(self._get_surf(image),
+                                          (0, 0, 0), (230, 230, 230, 255))
         return mask.centroid()
     
     def _get_surf(self, depthImage):
+        depthImage-self.base
         sface = pygame.Surface((480, 640))
         arr = pygame.surfarray.pixels_green(sface)
         arr[:] = depthImage[:]
@@ -41,7 +44,7 @@ def getDepthMap():
 
 if(__name__ == "__main__"):
     initMap = getDepthMap()
-    centroidManager = MaskCentroidManager(20)
+    centroidManager = MaskCentroidManager(20, getDepthMap())
 
     while 1:
         time.sleep(0.1)

@@ -12,7 +12,7 @@ class MaskCentroidManager():
 		self.lastimage = pygame.Surface((1,1))
                 
         def getCentroid(self, image):
-                mask = pygame.mask.from_threshold(self._get_surf(image), (127,127,127),(75,75,75,255))
+                mask = pygame.mask.from_threshold(self._get_surf(image), (0,0,0),(230,230,230,255))
                 return mask.centroid()
         
 	def _get_surf(self, depthImage):
