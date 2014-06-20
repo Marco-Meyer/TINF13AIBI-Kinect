@@ -29,7 +29,7 @@ def getDepthImage()
     return depth
 
 
-def main(eventManager)
+def main(eventManager, main_thread)
     centroidManager = CentroidManager(kinect_crop)
     deltaManager = DeltaManager(delta)
     
@@ -37,7 +37,7 @@ def main(eventManager)
     #should be checked for a movement
     time_passed = 0.0
     
-    while 1:
+    while main_thread.is_alive():
         time.sleep(kinect_interval)
         time_passed += kinect_interval
         centroid = centroidManager.getCentroid(getDepthImage())

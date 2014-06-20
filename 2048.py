@@ -194,9 +194,10 @@ def periodic_save():
 threading.Thread(target=periodic_save, name="AutoSaver").start()
 
 
-def load_music (self, file, path ="Sounds", ending = ".mp3"):
-    self.music[file] = P.mixer.music.load(join(path, file+ending))
 
+if kinect:
+    import Engine.event_main as kinectevents
+    threading.Thread(target = kinectevents.main, args = EM,main_thread)
 
 
 if __name__ == "__main__":
