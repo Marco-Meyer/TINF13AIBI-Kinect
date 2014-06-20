@@ -39,9 +39,9 @@ def convertToGreyScale(surface):
             greyscale = int(0.2989*color[0] + 0.5871 * color[1] + 0.114 * color[2])
             surface.set_at((x, y), (greyscale, greyscale, greyscale))
 
-
 P.init()
 gameover = False
+dirFlag = 0
 W,H = FIELD = (4,4)
 GRID = 150#Size of grid squares
 resw, resh = resolution = W*GRID, H*GRID
@@ -171,8 +171,10 @@ deltas = { 2**x : F.render(str(2**x), 1, (50,50,200)) for x in range(20)}
 #Game Over-Surface
 GO = P.Surface((resw, resh), P.SRCALPHA)
 GO.fill(gocolor)
-gof = F.render("Game Over", True, (255, 255, 255))
+gof = F.render("Game Over", True, (0, 0, 0))
+goi = scF.render("Move right to start again", True, (0,0,0))
 blit_centered(GO, gof, (resw/2, resh/2))
+blit_centered(GO, goi, (resw/2, resh/2+50))
 
 #misc
 clock = P.time.Clock()
@@ -217,13 +219,13 @@ if __name__ == "__main__":
             elif e.type == P.KEYDOWN and not gameover:
                 direction = 0
                 if e.key == P.K_RIGHT:
-                    direction = 1
+                    direction = dirFlag = 1
                 elif e.key == P.K_UP:
-                    direction = 2
+                    direction = dirFlag = 2
                 elif e.key == P.K_LEFT:
-                    direction = 3
+                    direction = dirFlag = 3
                 elif e.key == P.K_DOWN:
-                    direction = 4
+                    direction = dirFlag = 4
                 if direction:
                     grid.fresh = set()
                     grid.last = numpy.copy(grid.area)
@@ -240,7 +242,7 @@ if __name__ == "__main__":
                                 gameover = True
                 else:
                     if e.key == P.K_m:
-                        show_moves = not show_moves
+                        show_moves = not show_moves                           
                         continue                                    
             elif e.type == P.KEYDOWN and gameover:
                 if move_timeout <= timer and e.key == P.K_RIGHT:
@@ -272,9 +274,19 @@ if __name__ == "__main__":
         D.blit(clip, (329, 0))
         D.blit(clip, (539, 0))
 
+        #show movingdirection
+        if(dirFlag == 1):
+            D.blit(scF.render("right", True, (255, 255, 255)),(10,resh-50))
+        elif(dirFlag == 2):
+            D.blit(scF.render("up", True, (255, 255, 255)),(10,resh-50))
+        elif(dirFlag == 3):
+            D.blit(scF.render("left", True, (255, 255, 255)),(10,resh-50))
+        elif(dirFlag == 4):
+            D.blit(scF.render("down", True, (255, 255, 255)),(10,resh-50))
 
         if gameover: 
             convertToGreyScale(D)
+            dirFlag = 0
             D.blit(GO, (0,0))
 
         ###DEBUG VISUALISATION###
