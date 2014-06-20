@@ -1,11 +1,11 @@
 class DeltaManager:
-	def __init__(self, delta_x, delta_y):
-		self._centroids = []
-		self._delta_x = delta_x
-		self._delta_y = delta_y
-		self._lastMovement = -1	
+        def __init__(self, delta_x, delta_y):
+                self._centroids = []
+                self._delta_x = delta_x
+                self._delta_y = delta_y
+                self._lastMovement = -1
 
-	def add_Centroid(self, centroid):
+        def add_Centroid(self, centroid):
 		print(centroid)
 		self._centroids.append(centroid)
 
@@ -36,7 +36,7 @@ class DeltaManager:
 	def _isMovement(self, a, b):
 		dif = b - a
 
-                direction = self._getDirection(dif)
+                direction = self.get_direction(dif.angle, 10)
 
                 dic = { 0 : self._delta_x, 1 : self._delta_y, 2 : self._delta_x, 3 : self._delta_y }
                 fag = 1;
@@ -49,24 +49,15 @@ class DeltaManager:
                     
 		return direction if direction and dif.length >= dic[direction] * fag else -1
 	
-
-	def _getDirection(self, centroid):
-                tolerance = 10
-                for x in range(4):
-                        if x * 90 - tolerance < centroid.angle < x * 90 + tolerance:
-                                return x
-                return None
-	
-			
+        @staticmethod
+        def get_direction(angle, tolerance):
+                if angle % 90 < 10 or angle%90 > 80:
+                        dire = (angle%360+45)//90
+                        if dire == 4:dire = 0
+                        return int(dire)
+                else:return -1
 		
 
 if(__name__ == "__main__"):
-	delta = DeltaManager(2)
-
-	delta.addCentroid((0,0))
-	delta.addCentroid((0,1))
-	delta.addCentroid((0,2))
-	delta.addCentroid((1,0))
-	delta.addCentroid((2,0))
-
-	delta._findMovement()
+	delta = DeltaManager(2, 2)
+        delta.test()
