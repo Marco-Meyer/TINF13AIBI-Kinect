@@ -196,8 +196,9 @@ threading.Thread(target=periodic_save, name="AutoSaver").start()
 
 
 if kinect:
+    print("using kinect")
     import Engine.event_main as kinectevents
-    threading.Thread(target = kinectevents.main, args = EM,main_thread)
+    threading.Thread(target = kinectevents.main, args = (EM,main_thread)).start()
 
 
 if __name__ == "__main__":

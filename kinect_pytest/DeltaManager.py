@@ -47,7 +47,7 @@ class DeltaManager:
 			return -1
 	
 	
-	def _calculateDelta(self, direction)
+	def _calculateDelta(self, direction):
 		if direction == 0 && self._lastMovement == 1:
 			return self._delta * 2
 		elif direction == 1 && self._lastMovement == 0:
