@@ -4,10 +4,10 @@ class DeltaManager:
 		self._delta = delta
 		self._lastMovement = -1	
 
-	def addCentroid(self, centroid):
+	def add_Centroid(self, centroid):
 		self._centroids.append(centroid)
 
-	def getMoveEvents(self):
+	def get_Move_Events(self):
 		return self._findMovement()
         
 	def _findMovement(self):
