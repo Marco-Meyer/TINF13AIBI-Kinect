@@ -30,8 +30,10 @@ def main(eventManager, main_thread)
         if time_passed >= delta_interval:
             #push event
             #eventManager.dispatch(*deltaManager.get_Move_Events())
-            dic = { 0 : pygame.K_RIGHT, 2 : pygame.K_LEFT, 1 : pygame.K_TOP, 3 : pygame.K_BOTTOM }
-            pygame.event.Event(pygame.KEYDOWN, dic[deltaManager.get_Move_Events()])
-            time_passed = 0.0
+            movement = deltaManager.get_Move_Events()
+            if movement != -1:
+                dic = { 0 : pygame.K_RIGHT, 2 : pygame.K_LEFT, 1 : pygame.K_TOP, 3 : pygame.K_BOTTOM }
+                pygame.event.Event(pygame.KEYDOWN, dic[movement])
+                time_passed = 0.0
 
         
