@@ -10,6 +10,7 @@ from random import *
 from array import array
 import sys
 sys.path.append("Engine")
+kinect = "kinect" in sys.argv or "-kinect" in sys.argv
 from itertools import product
 import numpy
 from os.path import join
@@ -18,6 +19,7 @@ from Circuit import electronics
 from Circuit import lcd
 from score import Score
 from grid import Grid
+import os
 import time
 import atexit
 
@@ -36,9 +38,6 @@ def convertToGreyScale(surface):
             color = surface.get_at((x, y))
             greyscale = int(0.2989*color[0] + 0.5871 * color[1] + 0.114 * color[2])
             surface.set_at((x, y), (greyscale, greyscale, greyscale))
-
-
-
 
 P.init()
 gameover = False
@@ -80,7 +79,8 @@ P.display.update(r)
 del(r,loadtext)
 #Sound
 volume = 0.5 #between 0.0 - 1.0
-sound_time = 0.1
+slidetime = 0.1
+losetime = 1
 
 #Design
 bgU = P.image.load(join('Images', 'monitor.png'))
@@ -201,7 +201,7 @@ def load_music (self, file, path ="Sounds", ending = ".mp3"):
 if __name__ == "__main__":
 
     ####Background Sound####   
-    #P.mixer.music.play("Background.mp3")
+    sounds.play_backgroundmusic()  
     
     while 1:
         timer = time.time()
@@ -224,24 +224,21 @@ if __name__ == "__main__":
                 if direction:
                     grid.fresh = set()
                     grid.last = numpy.copy(grid.area)
-                    EM.dispatch("movement_start", grid, direction-1)
+                    EM.dispatch("movement_start", grid, direction-1)                  
                     if grid.move(direction-1):
-                        #sounds.timer_stop(("Slide", 0.1))
-                        sounds.play_sound("Slide")
-                        grid.fill_random()
-                        ###########Slide############
+                        #####Slide-Sound########
+                        sounds.play_slide_sound()                       
+                        grid.fill_random()                        
                         if grid.area.all() and not gameover:#grid full and not yet gameover
                             if not grid.check_merge():
                                 move_timeout = timer + 3 #1 second gameover
                                 ####Lose Sound####
-                                sounds.timer_stop("Lose", 0.1)
-                                sounds.play_sound("Lose")
+                                sounds.play_lose_sound()                              
                                 gameover = True
                 else:
                     if e.key == P.K_m:
-                        show_moves = not show_moves
-                        continue
-                                    
+                        show_moves = not show_moves                           
+                        continue                                    
             elif e.type == P.KEYDOWN and gameover:
                 if move_timeout <= timer and e.key == P.K_RIGHT:
                     score.save()
