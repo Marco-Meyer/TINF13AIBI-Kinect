@@ -20,6 +20,7 @@ from score import Score
 from grid import Grid
 import os
 import time
+import atexit
 
 class Game():
     def __init__(self, grid, score, scorebar):
@@ -29,6 +30,15 @@ class Game():
         score.game = self
         self.scbar = scorebar
         scorebar.game = self
+
+def convertToGreyScale(surface):
+    for x in range(surface.get_size()[0]):
+        for y in range(surface.get_size()[1]):
+            color = surface.get_at((x, y))
+            greyscale = int(0.2989*color[0] + 0.5871 * color[1] + 0.114 * color[2])
+            surface.set_at((x, y), (greyscale, greyscale, greyscale))
+
+
 
 
 P.init()
@@ -53,6 +63,7 @@ D = S.subsurface((0,vext, resw, resh))
 #Upper Surface ('Scorebar')
 U1 = S.subsurface((0, 0, reswH, vext))
 U2 = S.subsurface((reswH, 0, reswH, vext))
+
 
 if SOUNDS:
     from sounds import Sounds
@@ -161,7 +172,7 @@ deltas = { 2**x : F.render(str(2**x), 1, (50,50,200)) for x in range(20)}
 #Game Over-Surface
 GO = P.Surface((resw, resh), P.SRCALPHA)
 GO.fill(gocolor)
-gof = F.render("Game Over", True, (0, 0, 0))
+gof = F.render("Game Over", True, (255, 255, 255))
 blit_centered(GO, gof, (resw/2, resh/2))
 
 #misc
@@ -172,8 +183,20 @@ busy = idle = move_timeout = 0
 next_resource_print = time.time()+5
 show_moves = False
 
-##def load_music (self, file, path ="Sounds", ending = ".mp3"):
-##    self.music[file] = P.mixer.music.load(join(path, file+ending))
+#autosave
+import threading
+main_thread = threading.current_thread()#unfortunately when debugging this returns the debugger
+def periodic_save():
+    while main_thread.is_alive():
+        time.sleep(7)
+        score.save()
+        print("Autosaved")
+        
+threading.Thread(target=periodic_save, name="AutoSaver").start()
+
+
+def load_music (self, file, path ="Sounds", ending = ".mp3"):
+    self.music[file] = P.mixer.music.load(join(path, file+ending))
 
 
 
@@ -210,38 +233,21 @@ if __name__ == "__main__":
                         grid.fill_random()                        
                         if grid.area.all() and not gameover:#grid full and not yet gameover
                             if not grid.check_merge():
+                                move_timeout = timer + 3 #1 second gameover
                                 ####Lose Sound####
                                 sounds.play_lose_sound()                              
                                 gameover = True
-                elif e.type == P.KEYDOWN:
-                    if gameover:
-                        if not move_timeout > timer:new_Round()
                 else:
                     if e.key == P.K_m:
                         show_moves = not show_moves
-                        continue
-                    direction = 0
-                    if e.key == P.K_RIGHT:
-                        direction = 1
-                    elif e.key == P.K_UP:
-                        direction = 2
-                    elif e.key == P.K_LEFT:
-                        direction = 3
-                    elif e.key == P.K_DOWN:
-                        direction = 4
-                    if direction:
-                        grid.fresh = set()
-                        grid.last = numpy.copy(grid.area)
-                        EM.dispatch("movement_start", grid, direction-1)
-                        if grid.move(direction-1):
-                            grid.fill_random()
-                            if grid.area.all() and not gameover:#grid full and not yet gameover
-                                if not grid.check_merge():
-                                    move_timeout = time.time()+1#1 second gameover
-                                                                    ####Lose Sound####
-                                    
-                                    gameover = True                   
+                        continue                                    
+            elif e.type == P.KEYDOWN and gameover:
+                if move_timeout <= timer and e.key == P.K_RIGHT:
+                    score.save()
+                    new_Round()
 
+        
+                    
         #####LOGICBLOCK#####
         EM.dispatch("game_logic_start", grid)
 
@@ -257,6 +263,19 @@ if __name__ == "__main__":
                 elif delta[x,y]:blit_centered(D, deltas[val],pos)
                 else:blit_centered(D, text[val],pos)
 
+        #Transition
+        clip = P.image.load(join("Images", "clip.png"))
+        clip = P.transform.smoothscale(clip, (32, 13))
+        D.blit(clip, (29, 0))
+        D.blit(clip, (239, 0))
+        D.blit(clip, (329, 0))
+        D.blit(clip, (539, 0))
+
+
+        if gameover: 
+            convertToGreyScale(D)
+            D.blit(GO, (0,0))
+
         ###DEBUG VISUALISATION###
         if show_moves:
             for start,end in grid.change.moves:
@@ -264,9 +283,7 @@ if __name__ == "__main__":
                 P.draw.circle(D, (255,255,255), start, 30,1)
                 P.draw.line(D, (255,255,255), start, end)
                 P.draw.circle(D, (50,250,250), end, 10,1)
-            
-        if gameover:
-            D.blit(GO, (0,0))
+
             
         EM.dispatch("game_frame_end", D)
         P.display.flip()
