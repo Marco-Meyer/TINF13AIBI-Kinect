@@ -7,7 +7,7 @@ pygame.init()
 
 class CentroidManager:
 
-	def __init__(self, initialImage, size):
+        def __init__(self, initialImage, size):
 		self._size = size
 		self._initialImage = initialImage
 
@@ -36,8 +36,28 @@ class CentroidManager:
 		pxArray.replace(pygame.Color(255,255,255,255), pygame.Color(255,255,255,255), 0.9)
 		del(pxArray)
 
-		return pygame.transform.rotate(sface,-90)   
-
+		return pygame.transform.rotate(sface,-90)
+	
+class MaskCentroidManager():
+        def __init__(crop):
+                self.croprect = pygame.Rect(480-crop*2, 640-crop*2, crop, crop)
+                
+        def get_Centroid(self, image):
+                mask = pygame.mask.from_threshold(self._get_surf(image), (255,255,255),threshold = (75,75,75,255))
+                return mask.centroid()
+        
+	def _get_surf(self, depthImage):
+		sface = pygame.Surface((480, 640))
+		arr = pygame.surfarray.pixels_green(sface)
+		arr[:] = depthImage[:]
+		arr = pygame.surfarray.pixels_red(sface)
+		arr[:] = depthImage[:]
+		arr = pygame.surfarray.pixels_blue(sface)
+		arr[:] = depthImage[:]
+		del(arr)
+		sface = pygame.transform.chop(sface, self.croprect)
+		return pygame.transform.rotate(sface,-90)
+                
 def getDepthMap():    
     depth, timestamp = freenect.sync_get_depth()
  
