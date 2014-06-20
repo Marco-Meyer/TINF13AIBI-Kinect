@@ -190,8 +190,11 @@ main_thread = threading.current_thread()#unfortunately when debugging this retur
 def periodic_save():
     while main_thread.is_alive():
         time.sleep(7)
+        while not score.new:
+            time.sleep(1)
         score.save()
         print("Autosaved")
+        
         
 threading.Thread(target=periodic_save, name="AutoSaver").start()
 
