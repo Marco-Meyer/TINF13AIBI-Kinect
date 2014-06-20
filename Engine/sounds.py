@@ -30,7 +30,7 @@ class Sounds():
         self.play_sound("Slide", 0, 175)
         
     def play_lose_sound(self):
-        self.play_sound("Lose", -1 )        
+        self.play_sound("Lose", 0)        
         
     def play_sound(self, name, loop = 0, duration = 100000): #loop=0 == play 1 time duration in ms
         self.sounds[name].play(loop, duration)
