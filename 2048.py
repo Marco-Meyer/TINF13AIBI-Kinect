@@ -10,6 +10,7 @@ from random import *
 from array import array
 import sys
 sys.path.append("Engine")
+kinect = "kinect" in sys.argv or "-kinect" in sys.argv
 from itertools import product
 import numpy
 from os.path import join
@@ -43,6 +44,7 @@ def copyGridRow():
     for x in range(resw):
         for y in range(10):
             D.set_at((x, y), P.Color(pixelarray[x][y]))
+            surface.set_at((x, y), (greyscale, greyscale, greyscale))
 
 
 P.init()
@@ -269,6 +271,19 @@ if __name__ == "__main__":
                 elif delta[x,y]:blit_centered(D, deltas[val],pos)
                 else:blit_centered(D, text[val],pos)
         
+
+        #Transition
+        clip = P.image.load(join("Images", "clip.png"))
+        clip = P.transform.smoothscale(clip, (32, 13))
+        D.blit(clip, (29, 0))
+        D.blit(clip, (239, 0))
+        D.blit(clip, (329, 0))
+        D.blit(clip, (539, 0))
+
+
+        if gameover: 
+            convertToGreyScale(D)
+            D.blit(GO, (0,0))
 
         #Transition
         clip = P.image.load(join("Images", "clip.png"))
