@@ -18,6 +18,7 @@ from Circuit import electronics
 from Circuit import lcd
 from score import Score
 from grid import Grid
+import os
 import time
 import atexit
 
@@ -80,7 +81,8 @@ P.display.update(r)
 del(r,loadtext)
 #Sound
 volume = 0.5 #between 0.0 - 1.0
-sound_time = 0.1
+slidetime = 0.1
+losetime = 1
 
 #Design
 bgU = P.image.load(join('Images', 'monitor.png'))
@@ -201,7 +203,7 @@ def load_music (self, file, path ="Sounds", ending = ".mp3"):
 if __name__ == "__main__":
 
     ####Background Sound####   
-    #P.mixer.music.play("Background.mp3")
+    sounds.play_backgroundmusic()  
     
     while 1:
         timer = time.time()
@@ -224,24 +226,21 @@ if __name__ == "__main__":
                 if direction:
                     grid.fresh = set()
                     grid.last = numpy.copy(grid.area)
-                    EM.dispatch("movement_start", grid, direction-1)
+                    EM.dispatch("movement_start", grid, direction-1)                  
                     if grid.move(direction-1):
-                        #sounds.timer_stop(("Slide", 0.1))
-                        sounds.play_sound("Slide")
-                        grid.fill_random()
-                        ###########Slide############
+                        #####Slide-Sound########
+                        sounds.play_slide_sound()                       
+                        grid.fill_random()                        
                         if grid.area.all() and not gameover:#grid full and not yet gameover
                             if not grid.check_merge():
                                 move_timeout = timer + 3 #1 second gameover
                                 ####Lose Sound####
-                                sounds.timer_stop("Lose", 0.1)
-                                sounds.play_sound("Lose")
+                                sounds.play_lose_sound()                              
                                 gameover = True
                 else:
                     if e.key == P.K_m:
                         show_moves = not show_moves
-                        continue
-                                    
+                        continue                                    
             elif e.type == P.KEYDOWN and gameover:
                 if move_timeout <= timer and e.key == P.K_RIGHT:
                     score.save()
