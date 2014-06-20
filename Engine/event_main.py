@@ -2,8 +2,8 @@ import numpy as np
 import freenect
 import pygame
 import time
-import CentroidManager
-import DeltaManager
+import centroid_manager
+import delta_manager
 
 
 pygame.init()
