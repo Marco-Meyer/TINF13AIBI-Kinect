@@ -36,13 +36,13 @@ class DeltaManager:
 		x2, y2 = b
 		
 		if self._calculateDelta(0) < abs(x1-x2) and x1 < x2:
-			return ("kinect_movement", 0)
+			return 0#("kinect_movement", 0)
 		elif self._calculateDelta(1) < abs(x1-x2) and x1 > x2:
-			return ("kinect_movement", 2)
+			return 2#("kinect_movement", 2)
 		elif self._calculateDelta(2) < abs(y1-y2) and y1 < y2:
-			return ("kinect_movement", 1)
+			return 1#("kinect_movement", 1)
 		elif self._calculateDelta(3) < abs(y1-y2) and y1 > y2: 
-			return ("kinect_movement", 3)
+			return 3#("kinect_movement", 3)
 		else:
 			return -1
 	
