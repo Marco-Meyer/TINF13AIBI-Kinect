@@ -7,6 +7,9 @@ class DeltaManager:
 	def addCentroid(self, centroid):
 		self._centroids.append(centroid)
 
+        def getMoveEvents(self):
+                return self._findMovement()
+        
 	def _findMovement(self):
 		start = self._centroids[0]
 		nMove = -1
@@ -55,6 +58,8 @@ class DeltaManager:
 			return self._delta * 2
 
 		return self._delta
+
+	
 			
 		
 
