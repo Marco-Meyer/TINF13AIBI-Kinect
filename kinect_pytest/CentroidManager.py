@@ -3,8 +3,6 @@ import freenect
 import pygame as pygame
 import time
 
-pygame.init()
-
 class CentroidManager:
 
 	def __init__(self, initialImage, size):
