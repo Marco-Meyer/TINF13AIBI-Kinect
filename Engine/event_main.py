@@ -34,7 +34,7 @@ def updateSurface(centroidManager):
 
 def main(eventManager, main_thread):
     def post(event):
-        if main_thread.is_alive():
+        if main_thread and main_thread.is_alive():
             pygame.event.post(event)
             
     centroids = []
@@ -44,9 +44,10 @@ def main(eventManager, main_thread):
     #should be checked for a movement
     time_passed = 0.0
     lastmv = -1
-    
+    no_movement_count = 0
+    not_in_field = False
     print("Starting kinect loop")
-    while main_thread.is_alive():
+    while main_thread is None or main_thread.is_alive():
 
 	time.sleep(kinect_interval)
         time_passed += kinect_interval
@@ -54,17 +55,18 @@ def main(eventManager, main_thread):
 
         if x == 0 or y == 0:
             u = pygame.event.Event(pygame.USEREVENT, action = None)
+            not_in_field = True
             post(u)
             continue
         
-        centroids.append(centroid)
-
-        count_sleep = 0
-        # DEBUG updateSurface(centroidManager)
+        centroids.append(centroid)        
+        if main_thread is None:
+            updateSurface(centroidManager)
                 
         if time_passed >= delta_interval:
-                
+            
             for x in centroids[1:]:
+                
                 delta = x - centroids[0]
                 delta.y *= 2
                 s = "Delta:"+str(delta)+str(x)+ "->" + str(centroids[0])
@@ -72,38 +74,34 @@ def main(eventManager, main_thread):
                 if delta.length > delta_length: #and count_sleep <= 0:
                     direction = get_direction(delta.angle, 15)
                     if direction != -1:
-                        if  direction == 1 and lastmv == 3 or\
-                            direction == 3 and lastmv == 1: #or\
-                            #direction == 0 and lastmv == 2 or\
-                            #direction == 2 and lastmv == 0:
-                            print("movement cancelled " + ["Right","Down","Left", "Up"][direction])
-                            lastmv = -1
+                        if (direction == 3 or direction == 1) and no_movement_count < 2 or\
+                           (direction == 0 or direction == 2) and no_movement_count < 5 or\
+                           not_in_field and no_movement_count < 10:
+                            print("movement cancelled " + ["Left","Down","Right", "Up"][direction])
+                            not_in_field = False
                             break
 
                         print(["Left","Down","Right", "Up"][direction], str(centroids[0]) + "->" + str(x))
                         dic = { 2 : pygame.K_RIGHT, 0 : pygame.K_LEFT, 3 : pygame.K_UP, 1 : pygame.K_DOWN }
                         e = pygame.event.Event(pygame.KEYDOWN, key = dic[direction])
                         post(e)
-                        lastmv = direction
-                        count_sleep = 2
+                        no_movement_count = 0
                         break
                     
-                    else:
-                        direction = get_direction(delta.angle, 45)
-                        print("Movement unclear, could be", ["Right","Up","Left", "Down"][direction])
+                    #else:
+                        #direction = get_direction(delta.angle, 45)
+                        #print("Movement unclear, could be", ["Right","Up","Left", "Down"][direction])
 
             centroids = [centroids[-1]]
             
             time_passed = 0.0
-            lastmv = -1
-            
-            if count_sleep > 0:
-                count_sleep -= 1
+            no_movement_count += 1
+            print(no_movement_count)
             #print(["Right","Up","Left", "Down"][movement])
             
 if __name__ == "__main__":
     pygame.init()
-    
+    main(None, None)
     
 
         
