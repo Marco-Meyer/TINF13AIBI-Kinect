@@ -39,13 +39,13 @@ def main(eventManager, main_thread):
     def post(event):
         if main_thread and main_thread.is_alive():
             pygame.event.post(event)
-    post(pygame.event.Event(pygame.USEREVENT, message = "Please stand back, calibrating."))
+    post(pygame.event.Event(pygame.USEREVENT, usertype = "Kinect", message = "Please stand back, calibrating."))
     centroids = []
     centroidManager = MaskCentroidManager(kinect_crop, getDepthMap())
-    post(pygame.event.Event(pygame.USEREVENT, message = "Take Position."))
+    post(pygame.event.Event(pygame.USEREVENT, usertype = "Kinect", message = "Take Position."))
     time.sleep(gamestartwait)
-    notinfieldevent = pygame.event.Event(pygame.USEREVENT, message = "Please stand in front of the Kinect.")
-    everythingfineevent = pygame.event.Event(pygame.USEREVENT, message = "")
+    notinfieldevent = pygame.event.Event(pygame.USEREVENT, usertype = "Kinect", message = "Please stand in front of the Kinect.")
+    everythingfineevent = pygame.event.Event(pygame.USEREVENT, usertype = "Kinect", message = "")
     #sums the passed time to decide if centroids
     #should be checked for a movement
     time_passed = 0.0
