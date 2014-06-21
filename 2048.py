@@ -152,10 +152,8 @@ for ix,x in enumerate(range(xdelta,resw,xdelta)):
 tilemap = electronics.TileMap()
 elegrid = electronics.Grid(resolution, chip, connectors, centers.values(), tilemap)
 fizzles = electronics.AnimFizzle(elegrid, 50, 1)
-elegrid.surface.blit(clip, (29, 0))
-elegrid.surface.blit(clip, (239, 0))
-elegrid.surface.blit(clip, (329, 0))
-elegrid.surface.blit(clip, (539, 0))
+
+
 
 
 #score
@@ -288,10 +286,6 @@ if __name__ == "__main__":
                 elif delta[x,y]:blit_centered(D, deltas[val],pos)
                 else:blit_centered(D, text[val],pos)
         
-        #Transition
-
-
-
         if kinectWarning:D.blit(kinectwarninglabel, (10,resh-20))
 
         #show movingdirection
@@ -303,7 +297,12 @@ if __name__ == "__main__":
             D.blit(GO, (0,0))
             
         copyGridRow()
-
+        
+        S.blit(clip, (29, vext))
+        S.blit(clip, (239, vext))
+        S.blit(clip, (329, vext))
+        S.blit(clip, (539, vext))
+        
         ###DEBUG VISUALISATION###
         if show_moves:
             for start,end in grid.change.moves:
