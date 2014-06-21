@@ -49,7 +49,7 @@ def copyGridRow():
 P.init()
 gameover = False
 kinectWarningDisplayed = 0
-dirFlag = 0
+direction = 0
 W,H = FIELD = (4,4)
 GRID = 150#Size of grid squares
 resw, resh = resolution = W*GRID, H*GRID
@@ -92,6 +92,8 @@ losetime = 1
 
 #Design
 bgU = P.image.load(join('Images', 'monitor.png'))
+clip = P.image.load(join("Images", "clip.png"))
+clip = P.transform.smoothscale(clip, (32, 13))
 
 ####GAMEEVENTS####
 EM = Manager()
@@ -150,6 +152,11 @@ for ix,x in enumerate(range(xdelta,resw,xdelta)):
 tilemap = electronics.TileMap()
 elegrid = electronics.Grid(resolution, chip, connectors, centers.values(), tilemap)
 fizzles = electronics.AnimFizzle(elegrid, 50, 1)
+elegrid.surface.blit(clip, (29, 0))
+elegrid.surface.blit(clip, (239, 0))
+elegrid.surface.blit(clip, (329, 0))
+elegrid.surface.blit(clip, (539, 0))
+
 
 #score
 score = Score()
@@ -190,7 +197,8 @@ can_move = True
 busy = idle = move_timeout = 0
 next_resource_print = time.time()+5
 show_moves = False
-
+kinectWarning = ""
+directionnames = ["", "right", "up", "left", "down"]
 #autosave
 import threading
 main_thread = threading.current_thread()#unfortunately when debugging this returns the debugger
@@ -225,20 +233,20 @@ if __name__ == "__main__":
                 P.quit()
                 sys.exit()
             elif e.type == P.USEREVENT:
-                if e.action == None:
-                    kinectWarningDisplayed = 1
-                elif e.action == True:
-                    kinectWarningDisplayed = 0
+                if e.usertype == "Kinect":
+                    kinectWarning = e.message
+                    kinectwarninglabel = scF.render(kinectWarning, True, (255, 255, 255)), (10, 25)
+
             elif e.type == P.KEYDOWN and not gameover:
                 direction = 0
                 if e.key == P.K_RIGHT:
-                    direction = dirFlag = 1
+                    direction = 1
                 elif e.key == P.K_UP:
-                    direction = dirFlag = 2
+                    direction = 2
                 elif e.key == P.K_LEFT:
-                    direction = dirFlag = 3
+                    direction = 3
                 elif e.key == P.K_DOWN:
-                    direction = dirFlag = 4
+                    direction = 4
                 if direction:
                     grid.fresh = set()
                     grid.last = numpy.copy(grid.area)
@@ -281,29 +289,17 @@ if __name__ == "__main__":
                 else:blit_centered(D, text[val],pos)
         
         #Transition
-        clip = P.image.load(join("Images", "clip.png"))
-        clip = P.transform.smoothscale(clip, (32, 13))
-        D.blit(clip, (29, 0))
-        D.blit(clip, (239, 0))
-        D.blit(clip, (329, 0))
-        D.blit(clip, (539, 0))
 
-        if kinectWarningDisplayed == 1:
-            D.blit(scF.render("Please stand in front of the kinect", True, (255, 255, 255)), (10, 25))
+
+
+        if kinectWarning:D.blit(kinectwarninglabel, (10,resh-20))
 
         #show movingdirection
-        if(dirFlag == 1):
-            D.blit(scF.render("right", True, (255, 255, 255)),(10,resh-50))
-        elif(dirFlag == 2):
-            D.blit(scF.render("up", True, (255, 255, 255)),(10,resh-50))
-        elif(dirFlag == 3):
-            D.blit(scF.render("left", True, (255, 255, 255)),(10,resh-50))
-        elif(dirFlag == 4):
-            D.blit(scF.render("down", True, (255, 255, 255)),(10,resh-50))
+        if direction:D.blit(scF.render(directionnames[direction], True, (255, 255, 255)),(10,resh-50))
 
         if gameover: 
             convertToGreyScale(D)
-            dirFlag = 0
+            direction = 0
             D.blit(GO, (0,0))
             
         copyGridRow()
