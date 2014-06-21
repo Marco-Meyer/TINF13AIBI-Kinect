@@ -1,4 +1,5 @@
 #! python2.7
+# -*- coding: utf-8 -*-
 #Use Python 3 features from the future:
 from __future__ import division, print_function
 
@@ -220,7 +221,7 @@ if __name__ == "__main__":
         timer = time.time()
         #####EVENTBLOCK#####
         for e in P.event.get():
-            if e.type == P.QUIT:
+            if e.type == P.QUIT or e.type == P.KEYDOWN and e.key==P.K_ESCAPE:
                 P.quit()
                 sys.exit()
             elif e.type == P.USEREVENT:
@@ -288,7 +289,7 @@ if __name__ == "__main__":
         D.blit(clip, (539, 0))
 
         if kinectWarningDisplayed == 1:
-            D.blit(scF.render("Bitte stellen Sie sich näher zur Kinect", True, (255, 255, 255)), (10, 25))
+            D.blit(scF.render("Please stand in front of the kinect", True, (255, 255, 255)), (10, 25))
 
         #show movingdirection
         if(dirFlag == 1):

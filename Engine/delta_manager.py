@@ -6,7 +6,6 @@ class DeltaManager:
                 self._lastMovement = -1
 
         def add_Centroid(self, centroid):
-		print(centroid)
 		self._centroids.append(centroid)
 
 	def get_Move_Events(self):
@@ -47,7 +46,7 @@ class DeltaManager:
                     direction == 3 and self._lastMovement == 1:
                     fag = 2
                     
-		return direction if direction and dif.length >= dic[direction] * fag else -1
+		return direction if direction != -1 and dif.length >= dic[direction] * fag else -1
 	
         @staticmethod
         def get_direction(angle, tolerance):
