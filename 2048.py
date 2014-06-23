@@ -233,7 +233,7 @@ if __name__ == "__main__":
             elif e.type == P.USEREVENT:
                 if e.usertype == "Kinect":
                     kinectWarning = e.message
-                    kinectwarninglabel = scF.render(kinectWarning, True, (255, 255, 255)), (10, 25)
+                    kinectwarninglabel = scF.render(kinectWarning, True, (255, 255, 255))
 
             elif e.type == P.KEYDOWN and not gameover:
                 direction = 0
