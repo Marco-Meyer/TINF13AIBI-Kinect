@@ -76,7 +76,7 @@ def main(eventManager, main_thread):
                     if direction != -1:
                         if direction == 1 and no_movement_count < 2 or\
                            direction == 3 and no_movement_count < 3 or\
-                           (direction == 0 or direction == 2) and no_movement_count < 5 or\
+                           (direction == 0 or direction == 2) and no_movement_count < 3 or\
                            not_in_field and no_movement_count < 10:
                             print("movement cancelled " + ["Left","Down","Right", "Up"][direction])
                             not_in_field = False
