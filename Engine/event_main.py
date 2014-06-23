@@ -20,11 +20,8 @@ gamestartwait   = 5             #Time to wait for player to take position (in s)
 ################################################
 
 def get_direction(angle, tolerance):
-    if angle % 90 < 10 or angle%90 > 80:
-        dire = (angle%360+45)//90
-        if dire == 4:dire = 0
-        return int(dire)
-    else:return -1
+    if (90-tolerance > angle % 90 > tolerance):return -1
+    return int((angle%360+45)//90) % 4
 
 def updateSurface(centroidManager):
         display = pygame.display.set_mode((640,480))
