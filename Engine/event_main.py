@@ -46,24 +46,19 @@ def main(eventManager, main_thread):
     time.sleep(gamestartwait)
     notinfieldevent = pygame.event.Event(pygame.USEREVENT, usertype = "Kinect", message = "Please stand in front of the Kinect.")
     everythingfineevent = pygame.event.Event(pygame.USEREVENT, usertype = "Kinect", message = "")
+    post(everythingfineevent)
     #sums the passed time to decide if centroids
     #should be checked for a movement
     time_passed = 0.0
     lastmv = -1
     no_movement_count = 0
-    not_in_field = False
+    
     print("Starting kinect loop")
     while main_thread is None or main_thread.is_alive():
 
 	time.sleep(kinect_interval)
         time_passed += kinect_interval
         x,y = centroid = vec2d(centroidManager.getCentroid(getDepthMap()))
-
-        if x == 0 or y == 0:
-            if not not_in_field:
-                not_in_field = True
-                post(notinfieldevent)
-            continue
         
         centroids.append(centroid)        
         if not main_thread:
@@ -82,10 +77,8 @@ def main(eventManager, main_thread):
                     if direction != -1:
                         if direction == 1 and no_movement_count < 2 or\
                            direction == 3 and no_movement_count < 3 or\
-                           (direction == 0 or direction == 2) and no_movement_count < 3 or\
-                           not_in_field and no_movement_count < 10:
+                           (direction == 0 or direction == 2) and no_movement_count < 3:
                             print("movement cancelled " + ["Left","Down","Right", "Up"][direction])
-                            not_in_field = False
                             post(everythingfineevent)
                             break
 
