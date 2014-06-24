@@ -178,9 +178,7 @@ gocolor = P.Color(255, 0, 0, 100)
 #surface
 text = { 2**x : F.render(str(2**x), 1, (250,250,250)) for x in range(20)}
 freshs = { 2**x : F.render(str(2**x), 1, (127,127,127)) for x in range(20)}
-
-#deltas = { 2**x : F.render(str(2**x), 1, (50,50,200)) for x in range(20)}
-deltas = { 2**x : F.render(str(2**x), 1, (200,200,20)) for x in range(20)}
+deltas = { 2**x : F.render(str(2**x), 1, (173,216,230)) for x in range(20)}
 
 #Game Over-Surface
 GO = P.Surface((resw, resh), P.SRCALPHA)
