@@ -171,7 +171,7 @@ sounds = Sounds()
 #colors
 background = P.Color("light grey")
 marker = P.Color(200,100,100)
-gocolor = P.Color(255, 0, 0, 100)
+gocolor = P.Color(255, 50, 50, 100)
 
 #surface
 text = { 2**x : F.render(str(2**x), 1, (250,250,250)) for x in range(20)}
@@ -181,6 +181,7 @@ deltas = { 2**x : F.render(str(2**x), 1, (173,216,230)) for x in range(20)}
 #Game Over-Surface
 GO = P.Surface((resw, resh), P.SRCALPHA)
 GO.fill(gocolor)
+
 gof = F.render("Game Over", True, (0, 0, 0))
 goi = scF.render("Move right to start again", True, (0,0,0))
 blit_centered(GO, gof, (resw/2, resh/2))
