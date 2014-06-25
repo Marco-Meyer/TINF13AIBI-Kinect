@@ -182,8 +182,12 @@ deltas = { 2**x : F.render(str(2**x), 1, (173,216,230)) for x in range(20)}
 GO = P.Surface((resw, resh), P.SRCALPHA)
 GO.fill(gocolor)
 
+import font_emboss
+
 gof = F.render("Game Over", True, (0, 0, 0))
 goi = scF.render("Move right to start again", True, (0,0,0))
+gof = font_emboss.surround(gof)
+goi = font_emboss.surround(goi)
 blit_centered(GO, gof, (resw/2, resh/2))
 blit_centered(GO, goi, (resw/2, resh/2+50))
 
