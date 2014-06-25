@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 #Use Python 3 features from the future:
 from __future__ import division, print_function
-
 #Build Configs
 SOUNDS = True
 
@@ -10,7 +9,6 @@ import pygame as P
 from random import *
 from array import array
 import sys
-sys.path.append("Engine")
 kinect = "kinect" in sys.argv or "-kinect" in sys.argv
 from itertools import product
 import numpy
@@ -72,10 +70,10 @@ U1 = S.subsurface((0, 0, reswH, vext))
 U2 = S.subsurface((reswH, 0, reswH, vext))
 
 if SOUNDS:
-    from sounds import Sounds
+    from Engine.sounds import Sounds
 else:
-    from sounds import NoSounds as Sounds
-from events import Manager
+    from Engine.sounds import NoSounds as Sounds
+from Engine.events import Manager
 F = P.font.Font(None, 70)#System default font @ 70 size
 scF = P.font.Font(None, 36)#Font of Scorebar @ 36 size
 loadtext = F.render("Loading", 1, (255,255,255),(0,0,0))

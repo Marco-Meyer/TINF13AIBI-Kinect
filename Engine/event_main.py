@@ -52,19 +52,17 @@ def main(eventManager, main_thread):
     
     print("Starting kinect loop")
     while main_thread is None or main_thread.is_alive():
-
-	time.sleep(kinect_interval)
+        time.sleep(kinect_interval)
         time_passed += kinect_interval
         x,y = centroid = vec2d(centroidManager.getCentroid(getDepthMap()))
-        
-        centroids.append(centroid)        
+
+        centroids.append(centroid)
         if not main_thread:
             updateSurface(centroidManager)
-                
+
         if time_passed >= delta_interval:
-            
             for x in centroids[1:]:
-                
+
                 delta = x - centroids[0]
                 delta.y *= 2
                 s = "Delta:"+str(delta)+str(x)+ "->" + str(centroids[0])
