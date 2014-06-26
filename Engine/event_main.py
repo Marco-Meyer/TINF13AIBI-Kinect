@@ -37,6 +37,7 @@ def main(eventManager, main_thread):
     def post(event):
         if main_thread and main_thread.is_alive():
             pygame.event.post(event)
+            
     post(pygame.event.Event(pygame.USEREVENT, usertype = "Kinect", message = "Please stand back, calibrating."))
     centroids = []
     centroidManager = MaskCentroidManager(kinect_crop, getDepthMap())
@@ -67,8 +68,7 @@ def main(eventManager, main_thread):
                 delta = x - centroids[0]
                 delta.y *= 2
                 s = "Delta:"+str(delta)+str(x)+ "->" + str(centroids[0])
-                #print(s)
-                if delta.length > delta_length: #and count_sleep <= 0:
+                if delta.length > delta_length:
                     direction = get_direction(delta.angle, 15)
                     if direction != -1:
                         if direction == 1 and no_movement_count < 2 or\
@@ -85,16 +85,11 @@ def main(eventManager, main_thread):
                         no_movement_count = 0
                         break
                     
-                    #else:
-                        #direction = get_direction(delta.angle, 45)
-                        #print("Movement unclear, could be", ["Right","Up","Left", "Down"][direction])
-
             centroids = [centroids[-1]]
             
             time_passed = 0.0
             no_movement_count += 1
             print(no_movement_count)
-            #print(["Right","Up","Left", "Down"][movement])
             
 if __name__ == "__main__":
     pygame.init()
