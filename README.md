@@ -34,3 +34,6 @@ Um die Kinect-Version von 2048 zu nutzen sind folgende Vorraussetzungen zu erfü
     python 2048.py kinect
     
    Das Programm im Kinect-Modus starten.
+
+Möglicherweise ist es auch auf anderen Betriebssystemen möglich dieses Projekt auszuführen (sofern alle erforderlichen Module vorhanden sind). Jedoch hat es bei Windows zu sehr vielen Komplikationen geführt, wenn man Freenect (OpenKinect) installieren wollte.
+Deshalb ist diese Anleitung nur für ein spezielles System.
